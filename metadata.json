@@ -1,10 +1,12 @@
 {
-  "description": "Dynamic top bar",
-  "name": "Dynamic top bar",
-  "shell-version": [
-    "46"
-  ],
-  "url": "",
-  "uuid": "dynamic-top-bar@velhlkj.com",
-  "version": 1
+    "uuid": "dynamic-panel@velhlkj.com",
+    "name": "Dynamic Panel",
+    "description": "A GNOME extension that dynamically changes the panel's appearance.",
+    "shell-version": ["46"],
+    "url": "https://github.com/velade/dynamic-panel",
+    "gettext-domain": "dynamic-panel",
+    "settings-schema": "org.gnome.shell.extensions.dynamic-panel",
+    "session-modes": ["user", "unlock-dialog"],
+    "version": 1,
+    "version-name": "1.0"
 }
