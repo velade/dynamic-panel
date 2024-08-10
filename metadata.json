@@ -1,0 +1,10 @@
+{
+  "description": "Dynamic top bar",
+  "name": "Dynamic top bar",
+  "shell-version": [
+    "46"
+  ],
+  "url": "",
+  "uuid": "dynamic-top-bar@velhlkj.com",
+  "version": 1
+}

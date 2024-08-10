@@ -1,0 +1,36 @@
+#panel {
+    background-color: rgba(0, 0, 0, 1);
+    transition: 500ms;
+}
+
+#panel:overview {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#panel.dynamic-panel {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#panel.dynamic-panel-margin0 {
+    margin: 0;
+}
+
+#panel.dynamic-panel-margin1 {
+    margin: 2px;
+}
+
+#panel.dynamic-panel-margin2 {
+    margin: 4px;
+}
+
+#panel.dynamic-panel-margin3 {
+    margin: 6px;
+}
+
+#panel.dynamic-panel-margin4 {
+    margin: 8px;
+}
+
+#panel.dynamic-panel-margin5 {
+    margin: 10px;
+}
