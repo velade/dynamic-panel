@@ -7,6 +7,6 @@
     "gettext-domain": "dynamic-panel",
     "settings-schema": "org.gnome.shell.extensions.dynamic-panel",
     "session-modes": ["user", "unlock-dialog"],
-    "version": 1,
-    "version-name": "1.0"
+    "version": 3,
+    "version-name": "1.2"
 }

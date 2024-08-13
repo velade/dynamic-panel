@@ -1,6 +1,7 @@
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -13,6 +14,7 @@ export default class DynamicPanelExtension extends Extension {
         this._windowSignalIds = null;
         this._delayedTimeoutId = null;
         this._ani = null;
+        this.panelHeight = 0;
     }
 
     enable() {
@@ -21,7 +23,6 @@ export default class DynamicPanelExtension extends Extension {
 
         this._actorSignalIds.set(Main.overview, [
             Main.overview.connect('showing', this._updatePanelStyle.bind(this)),
-            Main.overview.connect('hiding', this._updatePanelStyle.bind(this)),
             Main.overview.connect('hidden', this._updatePanelStyle.bind(this))
         ]);
 
@@ -42,6 +43,14 @@ export default class DynamicPanelExtension extends Extension {
             global.window_manager.connect('switch-workspace', this._updatePanelStyleDelayed.bind(this))
         ]);
 
+        let settings = new Gio.Settings({ schema: 'org.gnome.desktop.interface' });
+        this._actorSignalIds.set(settings, [
+            settings.connect('changed::color-scheme', this._updatePanelTheme.bind(this))
+        ])
+
+        this.panelHeight = Main.panel.get_height();
+
+        this._updatePanelTheme();
         this._updatePanelStyle();
     }
 
@@ -86,7 +95,17 @@ export default class DynamicPanelExtension extends Extension {
             return GLib.SOURCE_REMOVE;
         });
     }
-
+    _isDarkMode() {
+        let settings = new Gio.Settings({ schema: 'org.gnome.desktop.interface' });
+        return settings.get_string('color-scheme') === 'prefer-dark';
+    }
+    _updatePanelTheme() {
+        if (this._isDarkMode()) {
+            Main.panel.add_style_class_name("dark");
+        } else {
+            Main.panel.remove_style_class_name("dark");
+        }
+    }
     _updatePanelStyle() {
         if (Main.panel.has_style_pseudo_class("overview")) {
             this._setPanelStyle(false);
@@ -109,7 +128,7 @@ export default class DynamicPanelExtension extends Extension {
         const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         const isNearEnough = windows.some(metaWindow => {
             const verticalPosition = metaWindow.get_frame_rect().y;
-            return verticalPosition < (Main.panel.get_height() + 22) * scale;
+            return verticalPosition < this.panelHeight + 25 * scale;
         });
 
         this._setPanelStyle(!isNearEnough);
@@ -117,50 +136,42 @@ export default class DynamicPanelExtension extends Extension {
 
     _setPanelStyle(float) {
         if (float && !Main.panel.has_style_class_name(this.dynamicPanelClass)) {
+            this._floatAni(true);
             Main.panel.add_style_class_name(this.dynamicPanelClass);
-            let _step = 0;
-            if (this._ani) clearInterval(this._ani);
-            this._ani = setInterval(() => {
-                for (let s = 0; s <= 5; s++) {
-                    Main.panel.remove_style_class_name(this.dynamicPanelClass + "-margin" + s);
-                }
-                Main.panel.add_style_class_name(this.dynamicPanelClass + "-margin" + _step);
-                _step++;
-                if (_step > 5) {
-                    clearInterval(this._ani);
-                    this._ani = null;
-                }
-            }, 16);
         } else if (!float && Main.panel.has_style_class_name(this.dynamicPanelClass)) {
+            this._floatAni(false);
             Main.panel.remove_style_class_name(this.dynamicPanelClass);
-            let _step = 5;
-            if (this._ani) clearInterval(this._ani);
-            this._ani = setInterval(() => {
-                for (let s = 5; s >= 0; s--) {
-                    Main.panel.remove_style_class_name(this.dynamicPanelClass + "-margin" + s);
-                }
-                Main.panel.add_style_class_name(this.dynamicPanelClass + "-margin" + _step);
-                _step--;
-                if (_step < 0) {
-                    clearInterval(this._ani);
-                    this._ani = null;
-                }
-            }, 16);
         }
-        setTimeout(()=>{
-            this._fixRaiuds();
-        },0)
     }
-    
-    _fixRaiuds() {
+
+    _floatAni(float) {
+        if (
+            (float && Main.panel.has_style_class_name(this.dynamicPanelClass)) ||
+            (!float && !Main.panel.has_style_class_name(this.dynamicPanelClass))
+        ) { return; }
+        const startTime = new Date().getTime();
+        let progress = 0;
+        const duration = 200;
         const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-        const panelHeight = Main.panel.get_height() * scale;
-        setTimeout(()=>{
-            if (!Main.panel.has_style_class_name(this.dynamicPanelClass)) {
-                Main.panel.set_style(`border-radius: 0;`);
+        const panelHeight = Main.panel.get_height() / 2 * scale;
+        if (this._ani) clearInterval(this._ani);
+        this._ani = setInterval(() => {
+            let currentTime = new Date().getTime();
+            let elapsedTime = currentTime - startTime;
+            progress = Math.min(elapsedTime / duration, 1);
+            let currentValue;
+            if (float) {
+                currentValue = progress;
             } else {
-                Main.panel.set_style(`border-radius: ${panelHeight / 2}px;`);
+                currentValue = 1 - progress;
             }
-        },1)
+
+            Main.panel.set_style(`margin: ${10 * scale * currentValue}px; border-radius: ${panelHeight * currentValue}px;`);
+
+            if (progress >= 1) {
+                clearInterval(this._ani);
+                this._ani = null;
+            }
+        }, 10)
     }
 }
