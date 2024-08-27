@@ -2,6 +2,7 @@ import Meta from 'gi://Meta';
 import St from 'gi://St';
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
+const Tweener = imports.tweener.tweener;
 
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -14,7 +15,6 @@ export default class DynamicPanelExtension extends Extension {
         this._windowSignalIds = null;
         this._delayedTimeoutId = null;
         this._ani = null;
-        this.panelHeight = 0;
     }
 
     enable() {
@@ -47,8 +47,6 @@ export default class DynamicPanelExtension extends Extension {
         this._actorSignalIds.set(settings, [
             settings.connect('changed::color-scheme', this._updatePanelTheme.bind(this))
         ])
-
-        this.panelHeight = Main.panel.get_height();
 
         this._updatePanelTheme();
         this._updatePanelStyle();
@@ -128,7 +126,7 @@ export default class DynamicPanelExtension extends Extension {
         const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         const isNearEnough = windows.some(metaWindow => {
             const verticalPosition = metaWindow.get_frame_rect().y;
-            return verticalPosition < this.panelHeight + 25 * scale;
+            return verticalPosition < Main.layoutManager.panelBox.get_height() + 10 * scale;
         });
 
         this._setPanelStyle(!isNearEnough);
@@ -151,9 +149,28 @@ export default class DynamicPanelExtension extends Extension {
         ) { return; }
         const startTime = new Date().getTime();
         let progress = 0;
-        const duration = 200;
+        const duration = 250;
         const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         const panelHeight = Main.panel.get_height() / 2 * scale;
+        if (float) {
+            Tweener.removeTweens(Main.layoutManager.panelBox);
+            Tweener.addTween(Main.layoutManager.panelBox, {
+                translation_y: 10 * scale,
+                translation_x: 10 * scale,
+                width: Main.uiGroup.width - 20 * scale,
+                time: 0.25,
+                transition: 'easeInOutQuad'
+            })
+        } else {
+            Tweener.removeTweens(Main.layoutManager.panelBox);
+            Tweener.addTween(Main.layoutManager.panelBox, {
+                translation_y: 0,
+                translation_x: 0,
+                width: Main.uiGroup.width,
+                time: 0.25,
+                transition: 'easeInOutQuad'
+            })
+        }
         if (this._ani) clearInterval(this._ani);
         this._ani = setInterval(() => {
             let currentTime = new Date().getTime();
@@ -166,12 +183,12 @@ export default class DynamicPanelExtension extends Extension {
                 currentValue = 1 - progress;
             }
 
-            Main.panel.set_style(`margin: ${10 * scale * currentValue}px; border-radius: ${panelHeight * currentValue}px;`);
+            Main.panel.set_style(`border-radius: ${panelHeight * currentValue}px;`);
 
             if (progress >= 1) {
                 clearInterval(this._ani);
                 this._ani = null;
             }
-        }, 10)
+        }, 16.7)
     }
 }

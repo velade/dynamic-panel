@@ -1,6 +1,6 @@
 #panel {
     background-color: rgba(253, 253, 253, 1);
-    transition: 500ms;
+    transition: 250ms;
 }
 #panel .panel-button {
     color: black;
@@ -16,7 +16,7 @@
 
 #panel.dark {
     background-color: rgba(0, 0, 0, 1);
-    transition: 500ms;
+    transition: 250ms;
 }
 #panel.dark .panel-button {
     color: #FDFDFD;

@@ -2,11 +2,17 @@
     "uuid": "dynamic-panel@velhlkj.com",
     "name": "Dynamic Panel",
     "description": "A GNOME extension that dynamically changes the panel's appearance.",
-    "shell-version": ["46"],
+    "shell-version": [
+        "46",
+        "47"
+    ],
     "url": "https://github.com/velade/dynamic-panel",
     "gettext-domain": "dynamic-panel",
     "settings-schema": "org.gnome.shell.extensions.dynamic-panel",
-    "session-modes": ["user", "unlock-dialog"],
-    "version": 3,
-    "version-name": "1.2"
+    "session-modes": [
+        "user",
+        "unlock-dialog"
+    ],
+    "version": 4,
+    "version-name": "1.3"
 }
