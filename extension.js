@@ -69,6 +69,10 @@ export default class DynamicPanelExtension extends Extension {
         this._delayedTimeoutId = null;
 
         this._setPanelStyle(false);
+
+        Tweener.removeTweens(Main.layoutManager.panelBox);
+
+        Main.panel.set_style(``);
     }
 
     _onWindowActorAdded(container, metaWindowActor) {
