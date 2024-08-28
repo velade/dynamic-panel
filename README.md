@@ -23,9 +23,9 @@
 ### 1. 從Gnome Extensions安裝
 擴展鏈接：[https://extensions.gnome.org/extension/7284/dynamic-panel/](https://extensions.gnome.org/extension/7284/dynamic-panel/)
 ### 2. 從GitHub安裝
-從GitHub Clone或下載Zip到本地，將extension.js, metadata.json, stylesheet.css這三個文檔放置到 ~/.local/share/gnome-shell/extensions/**dynamic-panel&commat;velhlkj&period;com** 其他檔案不需要，目錄不存在則自行創建即可。
+從GitHub Clone或下載Zip到本地，將extension.js, metadata.json, stylesheet.css這三個文檔放置到 ~/.local/share/gnome-shell/extensions/`dynamic-panel@velhlkj.com` 其他檔案不需要，目錄不存在則自行創建即可。
 
-目錄是固定的，包括**dynamic-panel&commat;velhlkj&period;com**也是，**不可以更改目錄名**，否則擴展將不會顯示在列表中，也無法生效。這是由於gnome擴展要求目錄名與metadata.json中指定的uuid保持一致的原因。
+目錄是固定的，包括`dynamic-panel@velhlkj.com`也是，**不可以更改目錄名**，否則擴展將不會顯示在列表中，也無法生效。這是由於gnome擴展要求目錄名與metadata.json中指定的uuid保持一致的原因。
 
 # 關於性能
 由於gnome自身的css和gjs的緣故，CSS3的transition補間動畫居然對大部分屬性都是無效的！而requestAnimationFrame這個動畫幀對齊函數也無法使用。因此不得不使用固定幀間隔的循環做逐幀動畫來實現平滑移動、大小改變和圓角動畫，因此在**動畫過程中**性能上會有一定影響。但在**靜止狀態下不存在性能影響**。
