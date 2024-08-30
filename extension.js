@@ -2,7 +2,7 @@ import Meta from 'gi://Meta';
 import St from 'gi://St';
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
-const Tweener = imports.tweener.tweener;
+import Clutter from 'gi://Clutter';
 
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -24,10 +24,6 @@ export default class DynamicPanelExtension extends Extension {
         this._actorSignalIds.set(Main.overview, [
             Main.overview.connect('showing', this._updatePanelStyle.bind(this)),
             Main.overview.connect('hidden', this._updatePanelStyle.bind(this))
-        ]);
-
-        this._actorSignalIds.set(Main.sessionMode, [
-            Main.sessionMode.connect('updated', this._updatePanelStyle.bind(this))
         ]);
 
         for (const metaWindowActor of global.get_window_actors()) {
@@ -68,11 +64,15 @@ export default class DynamicPanelExtension extends Extension {
         }
         this._delayedTimeoutId = null;
 
+        // 設定為false，恢復到默認樣式，帶動畫用以優雅退場。
         this._setPanelStyle(false);
 
-        Tweener.removeTweens(Main.layoutManager.panelBox);
-
+        // 二次清理確保附加的內容被清除
         Main.panel.set_style(``);
+        Main.panel.remove_style_class_name("dark");
+        Main.panel.remove_style_class_name(this.dynamicPanelClass);
+        clearInterval(this._ani);
+        this._ani = null;
     }
 
     _onWindowActorAdded(container, metaWindowActor) {
@@ -91,6 +91,7 @@ export default class DynamicPanelExtension extends Extension {
     }
 
     _updatePanelStyleDelayed() {
+        GLib.timeout_clear(this._delayedTimeoutId);
         this._delayedTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
             this._updatePanelStyle();
             this._delayedTimeoutId = null;
@@ -157,22 +158,20 @@ export default class DynamicPanelExtension extends Extension {
         const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         const panelHeight = Main.panel.get_height() / 2 * scale;
         if (float) {
-            Tweener.removeTweens(Main.layoutManager.panelBox);
-            Tweener.addTween(Main.layoutManager.panelBox, {
+            Main.layoutManager.panelBox.ease({
                 translation_y: 10 * scale,
                 translation_x: 10 * scale,
                 width: Main.uiGroup.width - 20 * scale,
-                time: 0.25,
-                transition: 'easeInOutQuad'
+                duration: duration,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD
             })
         } else {
-            Tweener.removeTweens(Main.layoutManager.panelBox);
-            Tweener.addTween(Main.layoutManager.panelBox, {
+            Main.layoutManager.panelBox.ease({
                 translation_y: 0,
                 translation_x: 0,
                 width: Main.uiGroup.width,
-                time: 0.25,
-                transition: 'easeInOutQuad'
+                duration: duration,
+                mode: Clutter.AnimationMode.EASE_IN_QUAD
             })
         }
         if (this._ani) clearInterval(this._ani);

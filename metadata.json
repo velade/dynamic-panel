@@ -6,8 +6,7 @@
     "url": "https://github.com/velade/dynamic-panel",
     "gettext-domain": "dynamic-panel",
     "settings-schema": "org.gnome.shell.extensions.dynamic-panel",
-    "session-modes": ["user"],
-    "version": 3,
-    "version-name": "1.3",
+    "version": 4,
+    "version-name": "1.4",
     "donations": {"custom":"https://www.velhlkj.com/tw/home/subact=donate"}
 }
