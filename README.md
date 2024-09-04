@@ -32,4 +32,5 @@
 
 # 特別鳴謝
 **感謝transparent-top-bar的思路，因為剛剛接觸gjs，所以窗口靠近判定的實現靈感基本來源於transparent-top-bar的源碼。沒有這個代碼的思路作為參考，此擴展將難以實現**
+
 **感謝Google Gemini在研究過程中提供的幫助**
