@@ -23,7 +23,7 @@
 ### 1. 從Gnome Extensions安裝
 擴展鏈接：[https://extensions.gnome.org/extension/7284/dynamic-panel/](https://extensions.gnome.org/extension/7284/dynamic-panel/)
 ### 2. 從GitHub安裝
-從GitHub Clone或下載Zip到本地，將extension.js, metadata.json, stylesheet.css這三個文檔放置到 ~/.local/share/gnome-shell/extensions/`dynamic-panel@velhlkj.com` 其他檔案不需要，目錄不存在則自行創建即可。
+從GitHub Clone或下載Zip到本地，解壓縮所有文件到~/.local/share/gnome-shell/extensions/`dynamic-panel@velhlkj.com`目錄不存在則自行創建即可。注意不要套娃！extension.js應該直接在`dynamic-panel@velhlkj.com`中，而不是在`dynamic-panel@velhlkj.com`/dynamic-panel/中。
 
 目錄是固定的，包括`dynamic-panel@velhlkj.com`也是，**不可以更改目錄名**，否則擴展將不會顯示在列表中，也無法生效。這是由於gnome擴展要求目錄名與metadata.json中指定的uuid保持一致的原因。
 
@@ -32,3 +32,4 @@
 
 # 特別鳴謝
 **感謝transparent-top-bar的思路，因為剛剛接觸gjs，所以窗口靠近判定的實現靈感基本來源於transparent-top-bar的源碼。沒有這個代碼的思路作為參考，此擴展將難以實現**
+**感謝Google Gemini在研究過程中提供的幫助**

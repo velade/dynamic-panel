@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+	<schema id="org.gnome.shell.extensions.dynamic-panel" path="/org/gnome/shell/extensions/dynamic-panel/">
+		<key type="i" name="radius-times">
+			<default>100</default>
+			<summary>corner radius times</summary>
+			<description/>
+		</key>
+		<key type="i" name="float-width">
+			<default>99</default>
+			<summary>panel width in floatting mode</summary>
+			<description/>
+		</key>
+		<key type="i" name="float-align">
+			<default>1</default>
+			<summary>panel align for floatting mode</summary>
+			<description/>
+		</key>
+		<key type="i" name="base-margin">
+			<default>10</default>
+			<summary>the base margin of panel floatting</summary>
+			<description/>
+		</key>
+	</schema>
+</schemalist>

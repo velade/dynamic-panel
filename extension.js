@@ -21,6 +21,12 @@ export default class DynamicPanelExtension extends Extension {
         this._actorSignalIds = new Map();
         this._windowSignalIds = new Map();
 
+        this._settings = this.getSettings();
+        this._settings.connect('changed::radius-times', this._updatePanelStyleForce.bind(this))
+        this._settings.connect('changed::float-width', this._updatePanelStyleForce.bind(this))
+        this._settings.connect('changed::float-align', this._updatePanelStyleForce.bind(this))
+        this._settings.connect('changed::base-margin', this._updatePanelStyleForce.bind(this))
+
         this._actorSignalIds.set(Main.overview, [
             Main.overview.connect('showing', this._updatePanelStyle.bind(this)),
             Main.overview.connect('hidden', this._updatePanelStyle.bind(this))
@@ -58,6 +64,7 @@ export default class DynamicPanelExtension extends Extension {
         }
         this._actorSignalIds = null;
         this._windowSignalIds = null;
+        this._settings = null;
 
         if (this._delayedTimeoutId != null) {
             GLib.Source.remove(this._delayedTimeoutId);
@@ -65,7 +72,7 @@ export default class DynamicPanelExtension extends Extension {
         this._delayedTimeoutId = null;
 
         // 設定為false，恢復到默認樣式，帶動畫用以優雅退場。
-        this._setPanelStyle(false);
+        this._setPanelStyle(false, true);
 
         // 二次清理確保附加的內容被清除
         Main.panel.set_style(``);
@@ -109,7 +116,13 @@ export default class DynamicPanelExtension extends Extension {
             Main.panel.remove_style_class_name("dark");
         }
     }
-    _updatePanelStyle() {
+
+    _updatePanelStyleForce() {
+        this._updatePanelStyle(true);
+    }
+
+    _updatePanelStyle(force = false) {
+        if(typeof force != "boolean") force = false;
         if (Main.panel.has_style_pseudo_class("overview")) {
             this._setPanelStyle(false);
             return;
@@ -134,34 +147,44 @@ export default class DynamicPanelExtension extends Extension {
             return verticalPosition < Main.layoutManager.panelBox.get_height() + 10 * scale;
         });
 
-        this._setPanelStyle(!isNearEnough);
+        this._setPanelStyle(!isNearEnough, force);
     }
 
-    _setPanelStyle(float) {
-        if (float && !Main.panel.has_style_class_name(this.dynamicPanelClass)) {
-            this._floatAni(true);
+    _setPanelStyle(float, forceUpdate = false) {
+        if (float && (!Main.panel.has_style_class_name(this.dynamicPanelClass) || forceUpdate)) {
+            this._floatAni(true, forceUpdate);
             Main.panel.add_style_class_name(this.dynamicPanelClass);
-        } else if (!float && Main.panel.has_style_class_name(this.dynamicPanelClass)) {
-            this._floatAni(false);
+        } else if (!float && (Main.panel.has_style_class_name(this.dynamicPanelClass) || forceUpdate)) {
+            this._floatAni(false, forceUpdate);
             Main.panel.remove_style_class_name(this.dynamicPanelClass);
         }
     }
 
-    _floatAni(float) {
-        if (
-            (float && Main.panel.has_style_class_name(this.dynamicPanelClass)) ||
-            (!float && !Main.panel.has_style_class_name(this.dynamicPanelClass))
-        ) { return; }
+    _floatAni(float, forceUpdate = false) {
         const startTime = new Date().getTime();
         let progress = 0;
         const duration = 250;
         const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-        const panelHeight = Main.panel.get_height() / 2 * scale;
+        const panelHeight = Main.panel.get_height() / 2 * (this._settings.get_int("radius-times") / 100) * scale;
         if (float) {
+            let align = this._settings.get_int("float-align");
+            let baseMargin = this._settings.get_int("base-margin");
+            let x = 0;
+            switch (align) {
+                case 0:
+                    x = baseMargin;
+                    break;
+                case 1:
+                    x = Main.uiGroup.width * (1 - (this._settings.get_int("float-width") / 100)) / 2;
+                    break;
+                case 2:
+                    x = Main.uiGroup.width * (1 - (this._settings.get_int("float-width") / 100)) - baseMargin;
+                    break
+            }
             Main.layoutManager.panelBox.ease({
-                translation_y: 10 * scale,
-                translation_x: 10 * scale,
-                width: Main.uiGroup.width - 20 * scale,
+                translation_y: baseMargin * scale,
+                translation_x: x * scale,
+                width: Main.uiGroup.width * (this._settings.get_int("float-width") / 100),
                 duration: duration,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD
             })
