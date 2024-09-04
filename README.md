@@ -1,9 +1,9 @@
 # 動態頂部面板
-參考KDE Plasma6 的懸浮面板的設計，在附近沒有窗口時呈現半透明懸浮條效果，而當窗口靠近時則呈現實色面板的樣式。支援gnome的暗色模式和亮色模式切換。
+靈感來源於KDE Plasma6 的懸浮面板的設計，在附近沒有窗口時呈現半透明懸浮條效果，而當窗口靠近時則呈現實色面板的樣式。支援gnome的暗色模式和亮色模式切換。
 
 ## 懸浮模式
 ![懸浮模式](readme_images/transparent.png)
-當topbar附近沒有窗口時，會呈現懸浮模式，懸浮模式僅僅有半透明效果，沒有模糊效果（*正在嘗試內建模糊效果*），目前如果想要模糊效果，建議搭配Blur my shell對於面板的靜態pipeline使用。
+當topbar附近沒有窗口時，會呈現懸浮模式，懸浮模式僅僅有半透明效果，沒有模糊效果（*正在嘗試內建模糊效果*），目前如果想要模糊效果，建議搭配Blur my shell對於面板的靜態pipeline使用。Blur my shell動態模式會沒有圓角，這是Blur my shell的問題。
 ### Blur my shell 設定
 ![Blur my shell 設定](readme_images/bms_settings1.png)
 

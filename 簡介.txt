@@ -1,23 +1,25 @@
-Dynamic Panel
-Inspired by KDE Plasma 6's floating panel design, this extension provides a semi-transparent floating bar effect when there are no windows nearby, and switches to a solid panel style when windows approach. It supports both dark and light modes in GNOME.
+Dynamic Top Panel
+Inspired by KDE Plasma 6's floating panel design, this extension presents a translucent floating bar effect when there are no windows nearby, and switches to a solid panel style when windows approach. It supports both dark and light modes in GNOME.
 
 Floating Mode
-When there are no windows near the top bar, it enters floating mode. In this mode, it only has a semi-transparent effect without blurring (blurring effect is being attempted internally). If you want a blurring effect, it's recommended to use it in conjunction with "Blur my shell" for the panel's static pipeline.
+In floating mode, when there are no windows near the top bar, it will appear as a translucent floating bar. Currently, there is no built-in blur effect in floating mode (we are working on it). If you want a blur effect, it is recommended to use Blur my shell's static pipeline for the panel. Blur my shell's dynamic mode will not have rounded corners, which is an issue with Blur my shell itself.
 
-Docked Mode/Solid Mode
-When any window gets close enough (almost touching) to the top bar, it transforms into GNOME's default opaque panel, blending seamlessly with maximized windows, unlike themes that always float and might have a "light leak" issue.
+Docked/Solid Mode
+When any window gets close enough (almost touching) to the top bar, it will transform into GNOME's default opaque docked bar. This allows for better integration with maximized windows, avoiding the "light leakage" phenomenon often seen with themes that keep the top bar floating.
 
 Performance Considerations
-Due to limitations in GNOME's CSS and GJS, CSS3 transition animations are ineffective for most properties! Also, the requestAnimationFrame function for animation frame synchronization is unavailable. Therefore, smooth movement, resizing, and rounded corner animations have to be achieved through frame-by-frame animations using fixed interval loops, which might impact performance DURING animations. However, there's no performance impact when the panel is static.
+Due to limitations in GNOME's CSS and GJS, CSS3 transition animations are ineffective for most properties! Additionally, the requestAnimationFrame function for animation frame synchronization is unavailable. As a result, we have to use a fixed frame interval loop to achieve smooth movement, resizing, and rounded corner animations. This may have some performance impact during animations, but there is no impact when the panel is static.
 
 Special Thanks
-Thanks to the inspiration from "transparent-top-bar". As I'm new to GJS, the implementation of window proximity detection is largely based on the source code of "transparent-top-bar". Without the ideas from this code, this extension would have been difficult to realize.
+Thanks to the transparent-top-bar extension for its inspiration. As I am new to GJS, the implementation of window proximity detection was largely inspired by its source code. Without this reference, this extension would have been difficult to achieve.
+
+Thanks to Google Gemini for its assistance during the research process.
 
 動態頂部面板
-參考KDE Plasma6 的懸浮面板的設計，在附近沒有窗口時呈現半透明懸浮條效果，而當窗口靠近時則呈現實色面板的樣式。支援gnome的暗色模式和亮色模式切換。
+靈感來源於KDE Plasma6的懸浮面板的設計，在附近沒有窗口時呈現半透明懸浮條效果，而當窗口靠近時則呈現實色面板的樣式。支援gnome的暗色模式和亮色模式切換。
 
 懸浮模式
-懸浮模式 當topbar附近沒有窗口時，會呈現懸浮模式，懸浮模式僅僅有半透明效果，沒有模糊效果（正在嘗試內建模糊效果），目前如果想要模糊效果，建議搭配Blur my shell對於面板的靜態pipeline使用。
+懸浮模式 當topbar附近沒有窗口時，會呈現懸浮模式，懸浮模式僅僅有半透明效果，沒有模糊效果（正在嘗試內建模糊效果），目前如果想要模糊效果，建議搭配Blur my shell對於面板的靜態pipeline使用。Blur my shell動態模式會沒有圓角，這是Blur my shell的問題。
 
 停靠模式/實體模式
 停靠模式 當有任何窗口足夠靠近（幾乎接觸）Topbar時，Topbar將會變為gnome默認的不透明的停靠欄，與最大化窗口可以更好的融合，而不像主題一樣始終懸浮會有「漏光」的現象。
