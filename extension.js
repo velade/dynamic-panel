@@ -22,6 +22,7 @@ export default class DynamicPanelExtension extends Extension {
         this._windowSignalIds = new Map();
 
         this._settings = this.getSettings();
+        this._settings.connect('changed::transparent', this._updatePanelStyleForce.bind(this))
         this._settings.connect('changed::radius-times', this._updatePanelStyleForce.bind(this))
         this._settings.connect('changed::float-width', this._updatePanelStyleForce.bind(this))
         this._settings.connect('changed::float-align', this._updatePanelStyleForce.bind(this))
@@ -122,7 +123,7 @@ export default class DynamicPanelExtension extends Extension {
     }
 
     _updatePanelStyle(force = false) {
-        if(typeof force != "boolean") force = false;
+        if (typeof force != "boolean") force = false;
         if (Main.panel.has_style_pseudo_class("overview")) {
             this._setPanelStyle(false);
             return;
@@ -153,10 +154,17 @@ export default class DynamicPanelExtension extends Extension {
     _setPanelStyle(float, forceUpdate = false) {
         if (float && (!Main.panel.has_style_class_name(this.dynamicPanelClass) || forceUpdate)) {
             this._floatAni(true, forceUpdate);
+            for (let i = 0; i <= 100; i++) {
+                Main.panel.remove_style_class_name(this.dynamicPanelClass + "-" + i);
+            }
             Main.panel.add_style_class_name(this.dynamicPanelClass);
+            Main.panel.add_style_class_name(this.dynamicPanelClass + "-" + this._settings.get_int("transparent"));
         } else if (!float && (Main.panel.has_style_class_name(this.dynamicPanelClass) || forceUpdate)) {
             this._floatAni(false, forceUpdate);
-            Main.panel.remove_style_class_name(this.dynamicPanelClass);
+            for (let i = 0; i <= 100; i++) {
+                Main.panel.remove_style_class_name(this.dynamicPanelClass + "-" + i);
+                Main.panel.remove_style_class_name(this.dynamicPanelClass);
+            }
         }
     }
 

@@ -21,5 +21,10 @@
 			<summary>the base margin of panel floatting</summary>
 			<description/>
 		</key>
+		<key type="i" name="transparent">
+			<default>75</default>
+			<summary>the transparent of panel floatting</summary>
+			<description/>
+		</key>
 	</schema>
 </schemalist>

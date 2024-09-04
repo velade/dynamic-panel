@@ -13,6 +13,25 @@ export default class extends ExtensionPreferences {
         let grid = new Gtk.Grid();
         grid.set_column_spacing(10);
         grid.set_row_spacing(10);
+
+        // 透明度控制條
+        let lTransparent = new Gtk.Label({ label: '', use_markup: true, width_chars: 5 })
+        function updateTransparentLabel(val) { lTransparent.set_markup(`不透明度:\n<small>${val}%</small>`) }
+        let sTransparent = new Gtk.Scale({
+            orientation: Gtk.Orientation.HORIZONTAL,
+            hexpand: true,
+            digits: 0,
+            adjustment: new Gtk.Adjustment({ lower: 0, upper: 100, step_increment: 1 }),
+            value_pos: Gtk.PositionType.RIGHT,
+            round_digits: 0
+        })
+        sTransparent.connect('value-changed', (sw) => {
+            let newVal = sw.get_value()
+            if (newVal == settings.get_int('transparent')) return
+            settings.set_int('transparent', newVal)
+            updateTransparentLabel(newVal);
+        })
+
         // 圓角控制條
         let lRadius = new Gtk.Label({ label: '', use_markup: true, width_chars: 5 })
         function updateRadiusLabel(val) { lRadius.set_markup(`面板圓角:\n<small>${val}%</small>`) }
@@ -79,6 +98,8 @@ export default class extends ExtensionPreferences {
             settings.set_int('float-align', newVal)
         })
 
+        updateTransparentLabel(settings.get_int('transparent'))
+        sTransparent.set_value(settings.get_int('transparent'))
 
         updateRadiusLabel(settings.get_int('radius-times'))
         sRadius.set_value(settings.get_int('radius-times'))
@@ -90,17 +111,20 @@ export default class extends ExtensionPreferences {
 
         spMargin.set_value(settings.get_int('base-margin'))
 
-        grid.attach(lRadius, 0, 0, 1, 1);
-        grid.attach(sRadius, 1, 0, 1, 1);
+        grid.attach(lTransparent, 0, 0, 1, 1);
+        grid.attach(sTransparent, 1, 0, 1, 1);
 
-        grid.attach(lWidth, 0, 1, 1, 1);
-        grid.attach(sWidth, 1, 1, 1, 1);
+        grid.attach(lRadius, 0, 1, 1, 1);
+        grid.attach(sRadius, 1, 1, 1, 1);
 
-        grid.attach(lMargin, 0, 2, 1, 1);
-        grid.attach(spMargin, 1, 2, 1, 1);
+        grid.attach(lWidth, 0, 2, 1, 1);
+        grid.attach(sWidth, 1, 2, 1, 1);
 
-        grid.attach(lAlign, 0, 3, 1, 1);
-        grid.attach(cAlign, 1, 3, 1, 1);
+        grid.attach(lMargin, 0, 3, 1, 1);
+        grid.attach(spMargin, 1, 3, 1, 1);
+
+        grid.attach(lAlign, 0, 4, 1, 1);
+        grid.attach(cAlign, 1, 4, 1, 1);
 
         gAppearance.add(grid)
 
