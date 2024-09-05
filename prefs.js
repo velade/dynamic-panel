@@ -77,7 +77,7 @@ export default class extends ExtensionPreferences {
                 step_increment: 1
             }),
             climb_rate: 0.5,
-            digits: 2
+            digits: 0
         });
         spMargin.connect('value-changed', (sw) => {
             let newVal = sw.get_value();
@@ -128,7 +128,40 @@ export default class extends ExtensionPreferences {
 
         gAppearance.add(grid)
 
+        const gAnime = new Adw.PreferencesGroup({ title: "動畫設定" });
+
+        let grid2 = new Gtk.Grid();
+        grid2.set_column_spacing(10);
+        grid2.set_row_spacing(10);
+
+        // 動畫時長
+        let lSpeed = new Gtk.Label({ label: '', use_markup: true, width_chars: 5 })
+        lSpeed.set_markup(`動畫時長:\n(ms)`)
+        let spSpeed = new Gtk.SpinButton({
+            adjustment: new Gtk.Adjustment({
+                lower: 0,
+                upper: 9999,
+                step_increment: 1
+            }),
+            climb_rate: 0.5,
+            digits: 0
+        });
+        spSpeed.connect('value-changed', (sw) => {
+            let newVal = sw.get_value();
+            if (newVal == settings.get_int('duration')) return
+            settings.set_int('duration', newVal)
+        });
+
+        spSpeed.set_value(settings.get_int('duration'))
+
+        grid2.attach(lSpeed, 0, 0, 1, 1)
+        grid2.attach(spSpeed, 1, 0, 1, 1)
+
+        gAnime.add(grid2)
+
         page.add(gAppearance)
+        page.add(gAnime)
+
         window.add(page)
     }
 }

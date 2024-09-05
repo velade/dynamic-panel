@@ -26,5 +26,10 @@
 			<summary>the transparent of panel floatting</summary>
 			<description/>
 		</key>
+		<key type="i" name="duration">
+			<default>250</default>
+			<summary>The rate of panel transition speed</summary>
+			<description/>
+		</key>
 	</schema>
 </schemalist>

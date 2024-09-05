@@ -145,7 +145,7 @@ export default class DynamicPanelExtension extends Extension {
         const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         const isNearEnough = windows.some(metaWindow => {
             const verticalPosition = metaWindow.get_frame_rect().y;
-            return verticalPosition < Main.layoutManager.panelBox.get_height() + 10 * scale;
+            return verticalPosition < Main.layoutManager.panelBox.get_height() +  (this._settings.get_int("base-margin") * 2) * scale;
         });
 
         this._setPanelStyle(!isNearEnough, force);
@@ -171,7 +171,7 @@ export default class DynamicPanelExtension extends Extension {
     _floatAni(float) {
         const startTime = new Date().getTime();
         let progress = 0;
-        const duration = 250;
+        const duration = this._settings.get_int('duration');
         const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         const panelHeight = Main.panel.get_height() / 2 * (this._settings.get_int("radius-times") / 100) * scale;
         if (float) {
