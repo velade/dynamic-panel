@@ -23,7 +23,7 @@
 ### 1. 從Gnome Extensions安裝
 擴展鏈接：[https://extensions.gnome.org/extension/7284/dynamic-panel/](https://extensions.gnome.org/extension/7284/dynamic-panel/)
 ### 2. 從GitHub安裝
-從GitHub Clone或下載Zip到本地，解壓縮所有文件到~/.local/share/gnome-shell/extensions/`dynamic-panel@velhlkj.com`目錄不存在則自行創建即可。注意不要套娃！extension.js應該直接在`dynamic-panel@velhlkj.com`中，而不是在`dynamic-panel@velhlkj.com`/dynamic-panel/中。
+從GitHub Clone或下載Zip到本地，解壓縮所有文件到`~/.local/share/gnome-shell/extensions/dynamic-panel@velhlkj.com/`目錄不存在則自行創建即可。注意不要套娃！extension.js應該直接在`dynamic-panel@velhlkj.com`中，而不是在`dynamic-panel@velhlkj.com/dynamic-panel/`中。
 
 目錄是固定的，包括`dynamic-panel@velhlkj.com`也是，**不可以更改目錄名**，否則擴展將不會顯示在列表中，也無法生效。這是由於gnome擴展要求目錄名與metadata.json中指定的uuid保持一致的原因。
 
