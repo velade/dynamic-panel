@@ -168,7 +168,7 @@ export default class DynamicPanelExtension extends Extension {
         }
     }
 
-    _floatAni(float, forceUpdate = false) {
+    _floatAni(float) {
         const startTime = new Date().getTime();
         let progress = 0;
         const duration = 250;
@@ -183,16 +183,16 @@ export default class DynamicPanelExtension extends Extension {
                     x = baseMargin;
                     break;
                 case 1:
-                    x = Main.uiGroup.width * (1 - (this._settings.get_int("float-width") / 100)) / 2;
+                    x = Main.layoutManager.primaryMonitor.width * (1 - (this._settings.get_int("float-width") / 100)) / 2;
                     break;
                 case 2:
-                    x = Main.uiGroup.width * (1 - (this._settings.get_int("float-width") / 100)) - baseMargin;
+                    x = Main.layoutManager.primaryMonitor.width * (1 - (this._settings.get_int("float-width") / 100)) - baseMargin;
                     break
             }
             Main.layoutManager.panelBox.ease({
                 translation_y: baseMargin * scale,
                 translation_x: x * scale,
-                width: Main.uiGroup.width * (this._settings.get_int("float-width") / 100),
+                width: Main.layoutManager.primaryMonitor.width * (this._settings.get_int("float-width") / 100),
                 duration: duration,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD
             })
@@ -200,7 +200,7 @@ export default class DynamicPanelExtension extends Extension {
             Main.layoutManager.panelBox.ease({
                 translation_y: 0,
                 translation_x: 0,
-                width: Main.uiGroup.width,
+                width: Main.layoutManager.primaryMonitor.width,
                 duration: duration,
                 mode: Clutter.AnimationMode.EASE_IN_QUAD
             })
