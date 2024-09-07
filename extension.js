@@ -23,6 +23,7 @@ export default class DynamicPanelExtension extends Extension {
 
         this._settings = this.getSettings();
         this._settings.connect('changed::transparent', this._updatePanelStyleForce.bind(this))
+        this._settings.connect('changed::transparent-menus', this._updatePanelStyleForce.bind(this))
         this._settings.connect('changed::radius-times', this._updatePanelStyleForce.bind(this))
         this._settings.connect('changed::float-width', this._updatePanelStyleForce.bind(this))
         this._settings.connect('changed::float-align', this._updatePanelStyleForce.bind(this))
@@ -63,6 +64,9 @@ export default class DynamicPanelExtension extends Extension {
                 }
             }
         }
+        // 設定為false，恢復到默認樣式，帶動畫用以優雅退場。
+        this._setPanelStyle(false, true);
+
         this._actorSignalIds = null;
         this._windowSignalIds = null;
         this._settings = null;
@@ -72,13 +76,22 @@ export default class DynamicPanelExtension extends Extension {
         }
         this._delayedTimeoutId = null;
 
-        // 設定為false，恢復到默認樣式，帶動畫用以優雅退場。
-        this._setPanelStyle(false, true);
 
         // 二次清理確保附加的內容被清除
         Main.panel.set_style(``);
         Main.panel.remove_style_class_name("dark");
         Main.panel.remove_style_class_name(this.dynamicPanelClass);
+        for (const pmenu of Main.uiGroup.get_children()) {
+            if (!!pmenu.get_style_class_name &&
+                pmenu.get_style_class_name() &&
+                pmenu.get_style_class_name().toString().split(" ").includes("panel-menu")
+            ) {
+                for (let index = 0; index <= 100; index++) {
+                    pmenu.remove_style_class_name("floatting-menu-" + index);
+                    pmenu.remove_style_class_name("dark");
+                }
+            }
+        }
         clearInterval(this._ani);
         this._ani = null;
     }
@@ -113,8 +126,24 @@ export default class DynamicPanelExtension extends Extension {
     _updatePanelTheme() {
         if (this._isDarkMode()) {
             Main.panel.add_style_class_name("dark");
+            for (const pmenu of Main.uiGroup.get_children()) {
+                if (!!pmenu.get_style_class_name &&
+                    pmenu.get_style_class_name() &&
+                    pmenu.get_style_class_name().toString().split(" ").includes("panel-menu")
+                ) {
+                    pmenu.add_style_class_name("dark")
+                }
+            }
         } else {
             Main.panel.remove_style_class_name("dark");
+            for (const pmenu of Main.uiGroup.get_children()) {
+                if (!!pmenu.get_style_class_name &&
+                    pmenu.get_style_class_name() &&
+                    pmenu.get_style_class_name().toString().split(" ").includes("panel-menu")
+                ) {
+                    pmenu.remove_style_class_name("dark")
+                }
+            }
         }
     }
 
@@ -134,18 +163,16 @@ export default class DynamicPanelExtension extends Extension {
 
         const workspaceManager = global.workspace_manager;
         const activeWorkspace = workspaceManager.get_active_workspace();
-        const windows = activeWorkspace.list_windows().filter(metaWindow => {
+
+        const isNearEnough = activeWorkspace.list_windows().some(metaWindow => {
+            const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+            const verticalPosition = metaWindow.get_frame_rect().y;
             return metaWindow.is_on_primary_monitor()
                 && metaWindow.showing_on_its_workspace()
                 && !metaWindow.is_hidden()
                 && metaWindow.get_window_type() !== Meta.WindowType.DESKTOP
-                && !metaWindow.skip_taskbar;
-        });
-
-        const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-        const isNearEnough = windows.some(metaWindow => {
-            const verticalPosition = metaWindow.get_frame_rect().y;
-            return verticalPosition < Main.layoutManager.panelBox.get_height() +  (this._settings.get_int("base-margin") * 2) * scale;
+                && !metaWindow.skip_taskbar
+                && verticalPosition < Main.layoutManager.panelBox.get_height() + (this._settings.get_int("base-margin") * 2) * scale;
         });
 
         this._setPanelStyle(!isNearEnough, force);
@@ -153,24 +180,47 @@ export default class DynamicPanelExtension extends Extension {
 
     _setPanelStyle(float, forceUpdate = false) {
         if (float && (!Main.panel.has_style_class_name(this.dynamicPanelClass) || forceUpdate)) {
-            this._floatAni(true, forceUpdate);
             for (let i = 0; i <= 100; i++) {
                 Main.panel.remove_style_class_name(this.dynamicPanelClass + "-" + i);
             }
             Main.panel.add_style_class_name(this.dynamicPanelClass);
             Main.panel.add_style_class_name(this.dynamicPanelClass + "-" + this._settings.get_int("transparent"));
+            this._floatAni(true, forceUpdate);
+            this._updateMenuStyle();
         } else if (!float && (Main.panel.has_style_class_name(this.dynamicPanelClass) || forceUpdate)) {
-            this._floatAni(false, forceUpdate);
             for (let i = 0; i <= 100; i++) {
                 Main.panel.remove_style_class_name(this.dynamicPanelClass + "-" + i);
-                Main.panel.remove_style_class_name(this.dynamicPanelClass);
+            }
+            Main.panel.remove_style_class_name(this.dynamicPanelClass);
+            this._floatAni(false, forceUpdate);
+            this._updateMenuStyle();
+        }
+    }
+
+    _updateMenuStyle() {
+        if (this._settings.get_boolean('transparent-menus') && Main.panel.has_style_class_name(this.dynamicPanelClass)) {
+            for (const pmenu of Main.uiGroup.get_children()) {
+                if (!!pmenu.has_style_class_name &&
+                    pmenu.has_style_class_name("panel-menu")
+                ) {
+                    pmenu.add_style_class_name("floatting-menu-" + this._settings.get_int("transparent"));
+                }
+            }
+        } else {
+            for (const pmenu of Main.uiGroup.get_children()) {
+                if (!!pmenu.has_style_class_name &&
+                    pmenu.has_style_class_name("panel-menu")
+                ) {
+                    for (let index = 0; index <= 100; index++) {
+                        pmenu.remove_style_class_name("floatting-menu-" + index);
+                    }
+                }
             }
         }
     }
 
-    _floatAni(float) {
+    _floatAni(float, forceUpdate = false) {
         const startTime = new Date().getTime();
-        let progress = 0;
         const duration = this._settings.get_int('duration');
         const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         const panelHeight = Main.panel.get_height() / 2 * (this._settings.get_int("radius-times") / 100) * scale;
@@ -194,7 +244,7 @@ export default class DynamicPanelExtension extends Extension {
                 translation_x: x * scale,
                 width: Main.layoutManager.primaryMonitor.width * (this._settings.get_int("float-width") / 100),
                 duration: duration,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD
+                mode: Clutter.AnimationMode.EASE_OUT_SINE
             })
         } else {
             Main.layoutManager.panelBox.ease({
@@ -202,10 +252,11 @@ export default class DynamicPanelExtension extends Extension {
                 translation_x: 0,
                 width: Main.layoutManager.primaryMonitor.width,
                 duration: duration,
-                mode: Clutter.AnimationMode.EASE_IN_QUAD
+                mode: Clutter.AnimationMode.EASE_OUT_SINE
             })
         }
         if (this._ani) clearInterval(this._ani);
+        let progress = 0;
         this._ani = setInterval(() => {
             let currentTime = new Date().getTime();
             let elapsedTime = currentTime - startTime;

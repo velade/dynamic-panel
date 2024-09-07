@@ -10,18 +10,13 @@ export default class extends ExtensionPreferences {
 
         const gAppearance = new Adw.PreferencesGroup({ title: "外觀設定" });
 
-        let grid = new Gtk.Grid();
-        grid.set_column_spacing(10);
-        grid.set_row_spacing(10);
-
-        // 透明度控制條
-        let lTransparent = new Gtk.Label({ label: '', use_markup: true, width_chars: 5 })
-        function updateTransparentLabel(val) { lTransparent.set_markup(`不透明度:\n<small>${val}%</small>`) }
+        // 不透明度控制條
         let sTransparent = new Gtk.Scale({
             orientation: Gtk.Orientation.HORIZONTAL,
             hexpand: true,
             digits: 0,
             adjustment: new Gtk.Adjustment({ lower: 0, upper: 100, step_increment: 1 }),
+            draw_value: true,
             value_pos: Gtk.PositionType.RIGHT,
             round_digits: 0
         })
@@ -29,17 +24,24 @@ export default class extends ExtensionPreferences {
             let newVal = sw.get_value()
             if (newVal == settings.get_int('transparent')) return
             settings.set_int('transparent', newVal)
-            updateTransparentLabel(newVal);
+        })
+
+        // 透明度應用在選單
+        let sTransMenu = new Gtk.Switch({
+            valign: Gtk.Align.CENTER,
+        });
+        sTransMenu.connect('state-set', (sw, state) => {
+            if (state == settings.get_boolean('transparent-menus')) return
+            settings.set_boolean('transparent-menus', state)
         })
 
         // 圓角控制條
-        let lRadius = new Gtk.Label({ label: '', use_markup: true, width_chars: 5 })
-        function updateRadiusLabel(val) { lRadius.set_markup(`面板圓角:\n<small>${val}%</small>`) }
         let sRadius = new Gtk.Scale({
             orientation: Gtk.Orientation.HORIZONTAL,
             hexpand: true,
             digits: 0,
             adjustment: new Gtk.Adjustment({ lower: 1, upper: 100, step_increment: 1 }),
+            draw_value: true,
             value_pos: Gtk.PositionType.RIGHT,
             round_digits: 0
         })
@@ -47,16 +49,15 @@ export default class extends ExtensionPreferences {
             let newVal = sw.get_value()
             if (newVal == settings.get_int('radius-times')) return
             settings.set_int('radius-times', newVal)
-            updateRadiusLabel(newVal);
         })
+
         // 寬度控制條
-        let lWidth = new Gtk.Label({ label: '', use_markup: true, width_chars: 5 })
-        function updateWidthLabel(val) { lWidth.set_markup(`浮動長度:\n<small>${val}%</small>`) }
         let sWidth = new Gtk.Scale({
             orientation: Gtk.Orientation.HORIZONTAL,
             hexpand: true,
             digits: 0,
             adjustment: new Gtk.Adjustment({ lower: 1, upper: 100, step_increment: 1 }),
+            draw_value: true,
             value_pos: Gtk.PositionType.RIGHT,
             round_digits: 0
         })
@@ -64,12 +65,9 @@ export default class extends ExtensionPreferences {
             let newVal = sw.get_value()
             if (newVal == settings.get_int('float-width')) return
             settings.set_int('float-width', newVal)
-            updateWidthLabel(newVal);
         })
 
         // 基礎邊距
-        let lMargin = new Gtk.Label({ label: '', use_markup: true, width_chars: 5 })
-        lMargin.set_markup(`基礎邊距:\n(px)`)
         let spMargin = new Gtk.SpinButton({
             adjustment: new Gtk.Adjustment({
                 lower: 0,
@@ -86,8 +84,6 @@ export default class extends ExtensionPreferences {
         });
 
         // 對齊方式
-        let lAlign = new Gtk.Label({ label: '', use_markup: true, width_chars: 5 })
-        lAlign.set_markup(`對齊方式:`)
         let cAlign = new Gtk.ComboBoxText()
         cAlign.append_text("左側")
         cAlign.append_text("居中")
@@ -98,45 +94,42 @@ export default class extends ExtensionPreferences {
             settings.set_int('float-align', newVal)
         })
 
-        updateTransparentLabel(settings.get_int('transparent'))
         sTransparent.set_value(settings.get_int('transparent'))
-
-        updateRadiusLabel(settings.get_int('radius-times'))
         sRadius.set_value(settings.get_int('radius-times'))
-
-        updateWidthLabel(settings.get_int('float-width'))
         sWidth.set_value(settings.get_int('float-width'))
-
         cAlign.set_active(settings.get_int('float-align'))
-
         spMargin.set_value(settings.get_int('base-margin'))
+        sTransMenu.set_active(settings.get_boolean('transparent-menus'))
 
-        grid.attach(lTransparent, 0, 0, 1, 1);
-        grid.attach(sTransparent, 1, 0, 1, 1);
+        // 使用 Adw.ActionRow 來組織每個設置項
+        let rowTransparent = new Adw.ActionRow({ title: '不透明度 (%)' });
+        rowTransparent.add_suffix(sTransparent);
+        gAppearance.add(rowTransparent);
 
-        grid.attach(lRadius, 0, 1, 1, 1);
-        grid.attach(sRadius, 1, 1, 1, 1);
+        let rowTransMenu = new Adw.ActionRow({ title: '選單透明' });
+        rowTransMenu.add_suffix(sTransMenu);
+        gAppearance.add(rowTransMenu);
 
-        grid.attach(lWidth, 0, 2, 1, 1);
-        grid.attach(sWidth, 1, 2, 1, 1);
+        let rowRadius = new Adw.ActionRow({ title: '面板圓角 (%)' });
+        rowRadius.add_suffix(sRadius);
+        gAppearance.add(rowRadius);
 
-        grid.attach(lMargin, 0, 3, 1, 1);
-        grid.attach(spMargin, 1, 3, 1, 1);
+        let rowWidth = new Adw.ActionRow({ title: '浮動長度 (%)' });
+        rowWidth.add_suffix(sWidth);
+        gAppearance.add(rowWidth);
 
-        grid.attach(lAlign, 0, 4, 1, 1);
-        grid.attach(cAlign, 1, 4, 1, 1);
+        let rowMargin = new Adw.ActionRow({ title: '基礎邊距 (px)' });
+        rowMargin.add_suffix(spMargin);
+        gAppearance.add(rowMargin);
 
-        gAppearance.add(grid)
+        let rowAlign = new Adw.ActionRow({ title: '對齊方式' });
+        rowAlign.add_suffix(cAlign);
+        gAppearance.add(rowAlign);
 
+        // 動畫設定
         const gAnime = new Adw.PreferencesGroup({ title: "動畫設定" });
 
-        let grid2 = new Gtk.Grid();
-        grid2.set_column_spacing(10);
-        grid2.set_row_spacing(10);
-
         // 動畫時長
-        let lSpeed = new Gtk.Label({ label: '', use_markup: true, width_chars: 5 })
-        lSpeed.set_markup(`動畫時長:\n(ms)`)
         let spSpeed = new Gtk.SpinButton({
             adjustment: new Gtk.Adjustment({
                 lower: 0,
@@ -154,11 +147,9 @@ export default class extends ExtensionPreferences {
 
         spSpeed.set_value(settings.get_int('duration'))
 
-        grid2.attach(lSpeed, 0, 0, 1, 1)
-        grid2.attach(spSpeed, 1, 0, 1, 1)
-
-        gAnime.add(grid2)
-
+        let rowSpeed = new Adw.ActionRow({ title: '動畫時長 (ms)' });
+        rowSpeed.add_suffix(spSpeed);
+        gAnime.add(rowSpeed)
         page.add(gAppearance)
         page.add(gAnime)
 
