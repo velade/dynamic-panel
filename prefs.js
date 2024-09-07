@@ -1,6 +1,6 @@
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
-import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import { ExtensionPreferences, gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 export default class extends ExtensionPreferences {
     fillPreferencesWindow(window) {
@@ -8,7 +8,7 @@ export default class extends ExtensionPreferences {
 
         const page = new Adw.PreferencesPage();
 
-        const gAppearance = new Adw.PreferencesGroup({ title: "外觀設定" });
+        const gAppearance = new Adw.PreferencesGroup({ title: _("外觀設定") });
 
         // 不透明度控制條
         let sTransparent = new Gtk.Scale({
@@ -85,9 +85,9 @@ export default class extends ExtensionPreferences {
 
         // 對齊方式
         let cAlign = new Gtk.ComboBoxText()
-        cAlign.append_text("左側")
-        cAlign.append_text("居中")
-        cAlign.append_text("右側")
+        cAlign.append_text(_("左側"))
+        cAlign.append_text(_("居中"))
+        cAlign.append_text(_("右側"))
         cAlign.connect('changed', (sw) => {
             let newVal = sw.get_active()
             if (newVal == settings.get_int('float-align')) return
@@ -102,32 +102,32 @@ export default class extends ExtensionPreferences {
         sTransMenu.set_active(settings.get_boolean('transparent-menus'))
 
         // 使用 Adw.ActionRow 來組織每個設置項
-        let rowTransparent = new Adw.ActionRow({ title: '不透明度 (%)' });
+        let rowTransparent = new Adw.ActionRow({ title: _('不透明度 (%)') });
         rowTransparent.add_suffix(sTransparent);
         gAppearance.add(rowTransparent);
 
-        let rowTransMenu = new Adw.ActionRow({ title: '選單透明' });
+        let rowTransMenu = new Adw.ActionRow({ title: _('選單透明') });
         rowTransMenu.add_suffix(sTransMenu);
         gAppearance.add(rowTransMenu);
 
-        let rowRadius = new Adw.ActionRow({ title: '面板圓角 (%)' });
+        let rowRadius = new Adw.ActionRow({ title: _('面板圓角 (%)') });
         rowRadius.add_suffix(sRadius);
         gAppearance.add(rowRadius);
 
-        let rowWidth = new Adw.ActionRow({ title: '浮動長度 (%)' });
+        let rowWidth = new Adw.ActionRow({ title: _('浮動長度 (%)') });
         rowWidth.add_suffix(sWidth);
         gAppearance.add(rowWidth);
 
-        let rowMargin = new Adw.ActionRow({ title: '基礎邊距 (px)' });
+        let rowMargin = new Adw.ActionRow({ title: _('基礎邊距 (px)') });
         rowMargin.add_suffix(spMargin);
         gAppearance.add(rowMargin);
 
-        let rowAlign = new Adw.ActionRow({ title: '對齊方式' });
+        let rowAlign = new Adw.ActionRow({ title: _('對齊方式') });
         rowAlign.add_suffix(cAlign);
         gAppearance.add(rowAlign);
 
         // 動畫設定
-        const gAnime = new Adw.PreferencesGroup({ title: "動畫設定" });
+        const gAnime = new Adw.PreferencesGroup({ title: _("動畫設定") });
 
         // 動畫時長
         let spSpeed = new Gtk.SpinButton({
@@ -147,7 +147,7 @@ export default class extends ExtensionPreferences {
 
         spSpeed.set_value(settings.get_int('duration'))
 
-        let rowSpeed = new Adw.ActionRow({ title: '動畫時長 (ms)' });
+        let rowSpeed = new Adw.ActionRow({ title: _('動畫時長 (ms)') });
         rowSpeed.add_suffix(spSpeed);
         gAnime.add(rowSpeed)
         page.add(gAppearance)

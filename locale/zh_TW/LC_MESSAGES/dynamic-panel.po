@@ -1,0 +1,50 @@
+#
+# Velade <velade48@gmail.com>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Dynamic Panel 2.4\n"
+"Report-Msgid-Bugs-To: support@velhlkj.com\n"
+"POT-Creation-Date: 2023-09-07 00:03-0700\n"
+"PO-Revision-Date: 2024-09-07 15:07+0800\n"
+"Last-Translator: Velade <velade48@gmail.com>\n"
+"Language-Team: VELHLKJ <translate@velhlkj.com>\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plura   \n"
+"X-Generator: Gtranslator 46.1\n"
+
+msgid "外觀設定"
+msgstr "外觀設定"
+
+msgid "左側"
+msgstr "左側"
+
+msgid "居中"
+msgstr "居中"
+
+msgid "右側"
+msgstr "右側"
+
+msgid "不透明度 (%)"
+msgstr "不透明度 (%)"
+
+msgid "選單透明"
+msgstr "選單透明"
+
+msgid "面板圓角 (%)"
+msgstr "面板圓角 (%)"
+
+msgid "浮動長度 (%)"
+msgstr "浮動長度 (%)"
+
+msgid "基礎邊距 (px)"
+msgstr "基礎邊距 (px)"
+
+msgid "動畫設定"
+msgstr "動畫設定"
+
+msgid "動畫時長 (ms)"
+msgstr "動畫時長 (ms)"
