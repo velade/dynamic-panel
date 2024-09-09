@@ -230,18 +230,18 @@ export default class DynamicPanelExtension extends Extension {
             let x = 0;
             switch (align) {
                 case 0:
-                    x = baseMargin;
+                    x = baseMargin * scale;
                     break;
                 case 1:
                     x = Main.layoutManager.primaryMonitor.width * (1 - (this._settings.get_int("float-width") / 100)) / 2;
                     break;
                 case 2:
-                    x = Main.layoutManager.primaryMonitor.width * (1 - (this._settings.get_int("float-width") / 100)) - baseMargin;
+                    x = Main.layoutManager.primaryMonitor.width * (1 - (this._settings.get_int("float-width") / 100)) - (baseMargin * scale);
                     break
             }
             Main.layoutManager.panelBox.ease({
                 translation_y: baseMargin * scale,
-                translation_x: x * scale,
+                translation_x: x,
                 width: Main.layoutManager.primaryMonitor.width * (this._settings.get_int("float-width") / 100),
                 duration: duration,
                 mode: Clutter.AnimationMode.EASE_OUT_SINE
