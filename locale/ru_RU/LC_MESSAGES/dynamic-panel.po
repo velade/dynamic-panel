@@ -1,0 +1,52 @@
+#
+# Velade <velade48@gmail.com>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Dynamic Panel 2.4\n"
+"Report-Msgid-Bugs-To: support@velhlkj.com\n"
+"POT-Creation-Date: 2023-09-07 00:03-0700\n"
+"PO-Revision-Date: 2024-09-15 17:25+1100\n"
+"Last-Translator: Aleksandr Shamaraev <delphicoder@bk.ru>\n"
+"Language-Team: Aleksandr Shamaraev <delphicoder@bk.ru>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.4\n"
+
+msgid "外觀設定"
+msgstr "Настройки внешнего вида"
+
+msgid "左側"
+msgstr "Слева"
+
+msgid "居中"
+msgstr "По центру"
+
+msgid "右側"
+msgstr "Справа"
+
+msgid "不透明度 (%)"
+msgstr "Непрозрачность (%)"
+
+msgid "選單透明"
+msgstr "Прозрачные меню"
+
+msgid "面板圓角 (%)"
+msgstr "Скругление углов (%)"
+
+msgid "浮動長度 (%)"
+msgstr "Ширина панели (%)"
+
+msgid "基礎邊距 (px)"
+msgstr "Отступ сверху (px)"
+
+msgid "對齊方式"
+msgstr "Выравнивание"
+
+msgid "動畫設定"
+msgstr "Настройки анимации"
+
+msgid "動畫時長 (ms)"
+msgstr "Продолжительность (ms)"
