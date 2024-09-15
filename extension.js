@@ -298,7 +298,7 @@ export default class DynamicPanelExtension extends Extension {
         if (floating) {
             const align = this._settings.get_int("float-align");
             const baseMargin = this._settings.get_int("base-margin");
-            const floating_width = screenWidth * (this._settings.get_int("float-width") / 100);
+            const floating_width = (screenWidth * (this._settings.get_int("float-width") / 100)) - (baseMargin * 2);
             let x = 0;
             switch (align) {
                 case 0:
