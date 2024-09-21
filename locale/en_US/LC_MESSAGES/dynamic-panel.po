@@ -40,8 +40,11 @@ msgstr "Border Radius (%)"
 msgid "浮動長度 (%)"
 msgstr "Floating Width (%)"
 
-msgid "基礎邊距 (px)"
-msgstr "Base Margin (px)"
+msgid "頂部邊距 (px)"
+msgstr "Top Margin (px)"
+
+msgid "側面邊距 (px)"
+msgstr "Side Margin (px)"
 
 msgid "對齊方式"
 msgstr "Align"

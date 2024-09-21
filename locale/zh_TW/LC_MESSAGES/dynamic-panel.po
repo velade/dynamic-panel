@@ -40,8 +40,11 @@ msgstr "面板圓角 (%)"
 msgid "浮動長度 (%)"
 msgstr "浮動長度 (%)"
 
-msgid "基礎邊距 (px)"
-msgstr "基礎邊距 (px)"
+msgid "頂部邊距 (px)"
+msgstr "頂部邊距 (px)"
+
+msgid "側面邊距 (px)"
+msgstr "側面邊距 (px)"
 
 msgid "動畫設定"
 msgstr "動畫設定"

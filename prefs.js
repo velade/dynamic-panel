@@ -67,8 +67,8 @@ export default class extends ExtensionPreferences {
             settings.set_int('float-width', newVal)
         })
 
-        // 基礎邊距
-        let spMargin = new Gtk.SpinButton({
+        // 頂部邊距
+        let spTMargin = new Gtk.SpinButton({
             adjustment: new Gtk.Adjustment({
                 lower: 0,
                 upper: 100,
@@ -77,10 +77,26 @@ export default class extends ExtensionPreferences {
             climb_rate: 0.5,
             digits: 0
         });
-        spMargin.connect('value-changed', (sw) => {
+        spTMargin.connect('value-changed', (sw) => {
             let newVal = sw.get_value();
-            if (newVal == settings.get_int('base-margin')) return
-            settings.set_int('base-margin', newVal)
+            if (newVal == settings.get_int('top-margin')) return
+            settings.set_int('top-margin', newVal)
+        });
+
+        // 側面邊距
+        let spSMargin = new Gtk.SpinButton({
+            adjustment: new Gtk.Adjustment({
+                lower: 0,
+                upper: 100,
+                step_increment: 1
+            }),
+            climb_rate: 0.5,
+            digits: 0
+        });
+        spSMargin.connect('value-changed', (sw) => {
+            let newVal = sw.get_value();
+            if (newVal == settings.get_int('side-margin')) return
+            settings.set_int('side-margin', newVal)
         });
 
         // 對齊方式
@@ -92,13 +108,19 @@ export default class extends ExtensionPreferences {
             let newVal = sw.get_active()
             if (newVal == settings.get_int('float-align')) return
             settings.set_int('float-align', newVal)
+            if (newVal == 1) {
+                rowSMargin.sensitive = false;
+            }else {
+                rowSMargin.sensitive = true;
+            }
         })
 
         sTransparent.set_value(settings.get_int('transparent'))
         sRadius.set_value(settings.get_int('radius-times'))
         sWidth.set_value(settings.get_int('float-width'))
         cAlign.set_active(settings.get_int('float-align'))
-        spMargin.set_value(settings.get_int('base-margin'))
+        spTMargin.set_value(settings.get_int('top-margin'))
+        spSMargin.set_value(settings.get_int('side-margin'))
         sTransMenu.set_active(settings.get_boolean('transparent-menus'))
 
         // 使用 Adw.ActionRow 來組織每個設置項
@@ -118,10 +140,21 @@ export default class extends ExtensionPreferences {
         rowWidth.add_suffix(sWidth);
         gAppearance.add(rowWidth);
 
-        let rowMargin = new Adw.ActionRow({ title: _('基礎邊距 (px)') });
-        rowMargin.add_suffix(spMargin);
-        gAppearance.add(rowMargin);
+        let rowTMargin = new Adw.ActionRow({ title: _('頂部邊距 (px)') });
+        rowTMargin.add_suffix(spTMargin);
+        gAppearance.add(rowTMargin);
 
+        
+        let rowSMargin = new Adw.ActionRow({ title: _('側面邊距 (px)') });
+        rowSMargin.add_suffix(spSMargin);
+        gAppearance.add(rowSMargin);
+        
+        if (settings.get_int('float-align') == 1) {
+            rowSMargin.sensitive = false;
+        }else {
+            rowSMargin.sensitive = true;
+        }
+        
         let rowAlign = new Adw.ActionRow({ title: _('對齊方式') });
         rowAlign.add_suffix(cAlign);
         gAppearance.add(rowAlign);

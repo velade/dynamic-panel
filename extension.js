@@ -31,7 +31,8 @@ export default class DynamicPanelExtension extends Extension {
             this._settings.connect("changed::radius-times", () => { this._updatePanelSingleStyle("radius-times") }),
             this._settings.connect("changed::float-width", () => { this._updatePanelSingleStyle("float-width") }),
             this._settings.connect("changed::float-align", () => { this._updatePanelSingleStyle("float-align") }),
-            this._settings.connect("changed::base-margin", () => { this._updatePanelSingleStyle("base-margin") })
+            this._settings.connect("changed::top-margin", () => { this._updatePanelSingleStyle("top-margin") }),
+            this._settings.connect("changed::side-margin", () => { this._updatePanelSingleStyle("side-margin") })
         ])
 
         // 監控總覽界面顯示狀態
@@ -163,7 +164,7 @@ export default class DynamicPanelExtension extends Extension {
                 && !metaWindow.is_hidden()
                 && metaWindow.get_window_type() !== Meta.WindowType.DESKTOP
                 && !metaWindow.skip_taskbar
-                && verticalPosition < Main.layoutManager.panelBox.get_height() + (this._settings.get_int("base-margin") * 2) * scale;
+                && verticalPosition < (this._settings.get_int("top-margin") + Main.layoutManager.panelBox.get_height() + 5) * scale;
         });
 
         return !isNearEnough;
@@ -207,7 +208,8 @@ export default class DynamicPanelExtension extends Extension {
                 break;
             case "float-width":
             case "float-align":
-            case "base-margin":
+            case "top-margin":
+            case "side-margin":
                 this._setPanelAllocation(floating);
                 break;
         }
@@ -297,22 +299,23 @@ export default class DynamicPanelExtension extends Extension {
         const screenWidth = Main.layoutManager.primaryMonitor.width;
         if (floating) {
             const align = this._settings.get_int("float-align");
-            const baseMargin = this._settings.get_int("base-margin");
+            const topMargin = this._settings.get_int("top-margin");
+            const sideMargin = this._settings.get_int("side-margin");
             const floating_width = screenWidth * (this._settings.get_int("float-width") / 100);
             let x = 0;
             switch (align) {
                 case 0:
-                    x = baseMargin * scale;
+                    x = sideMargin * scale;
                     break;
                 case 1:
                     x = (screenWidth - floating_width) / 2;
                     break;
                 case 2:
-                    x = (screenWidth - floating_width) - (baseMargin * scale);
+                    x = (screenWidth - floating_width) - (sideMargin * scale);
                     break
             }
             Main.layoutManager.panelBox.ease({
-                translation_y: baseMargin * scale,
+                translation_y: topMargin * scale,
                 translation_x: x,
                 width: floating_width,
                 duration: duration,

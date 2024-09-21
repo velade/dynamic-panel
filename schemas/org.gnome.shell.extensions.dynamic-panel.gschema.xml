@@ -16,9 +16,14 @@
 			<summary>panel align for floatting mode</summary>
 			<description/>
 		</key>
-		<key type="i" name="base-margin">
+		<key type="i" name="top-margin">
 			<default>10</default>
-			<summary>the base margin of panel floatting</summary>
+			<summary>the top margin of panel floatting</summary>
+			<description/>
+		</key>
+		<key type="i" name="side-margin">
+			<default>10</default>
+			<summary>the side margin of panel floatting</summary>
 			<description/>
 		</key>
 		<key type="i" name="transparent">
