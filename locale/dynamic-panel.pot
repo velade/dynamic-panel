@@ -17,50 +17,41 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: prefs.js:11
 msgid "外觀設定"
 msgstr ""
 
-#: prefs.js:88
 msgid "左側"
 msgstr ""
 
-#: prefs.js:89
 msgid "居中"
 msgstr ""
 
-#: prefs.js:90
 msgid "右側"
 msgstr ""
 
-#: prefs.js:105
 msgid "不透明度 (%)"
 msgstr ""
 
-#: prefs.js:109
 msgid "選單透明"
 msgstr ""
 
-#: prefs.js:113
 msgid "面板圓角 (%)"
 msgstr ""
 
-#: prefs.js:117
 msgid "浮動長度 (%)"
 msgstr ""
 
-#: prefs.js:121
-msgid "基礎邊距 (px)"
+msgid "頂部邊距 (px)"
 msgstr ""
 
-#: prefs.js:125
+msgid "側面邊距 (px)"
+msgstr ""
+
 msgid "對齊方式"
 msgstr ""
 
-#: prefs.js:130
 msgid "動畫設定"
 msgstr ""
 
-#: prefs.js:150
 msgid "動畫時長 (ms)"
 msgstr ""
