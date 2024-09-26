@@ -2,13 +2,13 @@
 
 # Dynamic Top Panel
 
-Inspired by the floating panel design in KDE Plasma 6, this extension presents a translucent floating bar effect when there are no windows nearby, and switches to a solid panel style when windows approach. It supports both dark and light modes in GNOME.
+Inspired by the floating panel design in KDE Plasma 6, this extension presents a translucent floating bar effect when there are no windows nearby, and switches to a solid panel style when windows approach. It supports both dark and light modes in GNOME. Custom colors can be set separately for dark and light modes.
 
 ## Floating Mode
 
 ![Floating Mode](readme_images/transparent.png)
 
-When there are no windows near the top bar, it enters floating mode. In this mode, it only has a translucent effect without any blur (*we're working on adding a built-in blur effect*). If you desire a blur effect for now, it's recommended to use Blur my shell's static pipeline for the panel. Blur my shell's dynamic mode doesn't support rounded corners, which is an issue with Blur my shell itself.
+When there are no windows near the top bar, it enters floating mode. In this mode, it only has a translucent effect without any blur. If you desire a blur effect for now, it's recommended to use Blur my shell's static pipeline for the panel. Blur my shell's dynamic mode doesn't support rounded corners, which is an issue with Blur my shell itself.
 
 ### Blur my shell Settings
 

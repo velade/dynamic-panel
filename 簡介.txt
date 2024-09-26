@@ -2,7 +2,7 @@ Dynamic Top Panel
 Inspired by KDE Plasma 6's floating panel design, this extension presents a translucent floating bar effect when there are no windows nearby, and switches to a solid panel style when windows approach. It supports both dark and light modes in GNOME.
 
 Floating Mode
-In floating mode, when there are no windows near the top bar, it will appear as a translucent floating bar. Currently, there is no built-in blur effect in floating mode (we are working on it). If you want a blur effect, it is recommended to use Blur my shell's static pipeline for the panel. Blur my shell's dynamic mode will not have rounded corners, which is an issue with Blur my shell itself.
+In floating mode, when there are no windows near the top bar, it will appear as a translucent floating bar. Currently, there is no built-in blur effect in floating mode. If you want a blur effect, it is recommended to use Blur my shell's static pipeline for the panel. Blur my shell's dynamic mode will not have rounded corners, which is an issue with Blur my shell itself.
 
 Docked/Solid Mode
 When any window gets close enough (almost touching) to the top bar, it will transform into GNOME's default opaque docked bar. This allows for better integration with maximized windows, avoiding the "light leakage" phenomenon often seen with themes that keep the top bar floating.
@@ -19,7 +19,7 @@ Thanks to Google Gemini for its assistance during the research process.
 靈感來源於KDE Plasma6的懸浮面板的設計，在附近沒有窗口時呈現半透明懸浮條效果，而當窗口靠近時則呈現實色面板的樣式。支援gnome的暗色模式和亮色模式切換。
 
 懸浮模式
-懸浮模式 當topbar附近沒有窗口時，會呈現懸浮模式，懸浮模式僅僅有半透明效果，沒有模糊效果（正在嘗試內建模糊效果），目前如果想要模糊效果，建議搭配Blur my shell對於面板的靜態pipeline使用。Blur my shell動態模式會沒有圓角，這是Blur my shell的問題。
+懸浮模式 當topbar附近沒有窗口時，會呈現懸浮模式，懸浮模式僅僅有半透明效果，沒有模糊效果，目前如果想要模糊效果，建議搭配Blur my shell對於面板的靜態pipeline使用。Blur my shell動態模式會沒有圓角，這是Blur my shell的問題。
 
 停靠模式/實體模式
 停靠模式 當有任何窗口足夠靠近（幾乎接觸）Topbar時，Topbar將會變為gnome默認的不透明的停靠欄，與最大化窗口可以更好的融合，而不像主題一樣始終懸浮會有「漏光」的現象。
