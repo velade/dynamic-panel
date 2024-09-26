@@ -49,6 +49,24 @@ msgstr "侧面边距 (px)"
 msgid "對齊方式"
 msgstr "对齐方式"
 
+msgid "自訂顏色"
+msgstr "自定颜色"
+
+msgid "暗黑模式"
+msgstr "暗黑模式"
+
+msgid "明亮模式"
+msgstr "明亮模式"
+
+msgid "背景色"
+msgstr "背景色"
+
+msgid "前景色"
+msgstr "前景色"
+
+msgid "應用於實體模式"
+msgstr "应用于实体模式"
+
 msgid "動畫設定"
 msgstr "动画设置"
 

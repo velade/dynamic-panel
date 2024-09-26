@@ -1,5 +1,6 @@
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
+import Gdk from 'gi://Gdk';
 import { ExtensionPreferences, gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 export default class extends ExtensionPreferences {
@@ -110,9 +111,46 @@ export default class extends ExtensionPreferences {
             settings.set_int('float-align', newVal)
             if (newVal == 1) {
                 rowSMargin.sensitive = false;
-            }else {
+            } else {
                 rowSMargin.sensitive = true;
             }
+        })
+
+        // 暗黑模式顏色設定
+        let cDBGColor = new Gtk.ColorButton();
+        cDBGColor.set_use_alpha(false);
+        cDBGColor.connect('color-set', () => {
+            let newColor = cDBGColor.get_rgba();
+            settings.set_string('dark-bg-color', newColor.to_string());
+        });
+        let cDFGColor = new Gtk.ColorButton();
+        cDFGColor.set_use_alpha(false);
+        cDFGColor.connect('color-set', () => {
+            let newColor = cDFGColor.get_rgba();
+            settings.set_string('dark-fg-color', newColor.to_string());
+        });
+
+        // 明亮模式顏色設定
+        let cLBGColor = new Gtk.ColorButton();
+        cLBGColor.set_use_alpha(false);
+        cLBGColor.connect('color-set', () => {
+            let newColor = cLBGColor.get_rgba();
+            settings.set_string('light-bg-color', newColor.to_string());
+        });
+        let cLFGColor = new Gtk.ColorButton();
+        cLFGColor.set_use_alpha(false);
+        cLFGColor.connect('color-set', () => {
+            let newColor = cLFGColor.get_rgba();
+            settings.set_string('light-fg-color', newColor.to_string());
+        });
+
+        // 顏色在靜態模式生效設定
+        let sUseInStatic = new Gtk.Switch({
+            valign: Gtk.Align.CENTER,
+        });
+        sUseInStatic.connect('state-set', (sw, state) => {
+            if (state == settings.get_boolean('colors-use-in-static')) return
+            settings.set_boolean('colors-use-in-static', state)
         })
 
         sTransparent.set_value(settings.get_int('transparent'))
@@ -122,6 +160,21 @@ export default class extends ExtensionPreferences {
         spTMargin.set_value(settings.get_int('top-margin'))
         spSMargin.set_value(settings.get_int('side-margin'))
         sTransMenu.set_active(settings.get_boolean('transparent-menus'))
+        sUseInStatic.set_active(settings.get_boolean('colors-use-in-static'))
+        // 顏色初始值
+        let rgba = new Gdk.RGBA();
+
+        rgba.parse(settings.get_string('dark-bg-color'));
+        cDBGColor.set_rgba(rgba);
+
+        rgba.parse(settings.get_string('dark-fg-color'));
+        cDFGColor.set_rgba(rgba);
+
+        rgba.parse(settings.get_string('light-bg-color'));
+        cLBGColor.set_rgba(rgba);
+
+        rgba.parse(settings.get_string('light-fg-color'));
+        cLFGColor.set_rgba(rgba);
 
         // 使用 Adw.ActionRow 來組織每個設置項
         let rowTransparent = new Adw.ActionRow({ title: _('不透明度 (%)') });
@@ -144,20 +197,42 @@ export default class extends ExtensionPreferences {
         rowTMargin.add_suffix(spTMargin);
         gAppearance.add(rowTMargin);
 
-        
+
         let rowSMargin = new Adw.ActionRow({ title: _('側面邊距 (px)') });
         rowSMargin.add_suffix(spSMargin);
         gAppearance.add(rowSMargin);
-        
+
         if (settings.get_int('float-align') == 1) {
             rowSMargin.sensitive = false;
-        }else {
+        } else {
             rowSMargin.sensitive = true;
         }
-        
+
         let rowAlign = new Adw.ActionRow({ title: _('對齊方式') });
         rowAlign.add_suffix(cAlign);
         gAppearance.add(rowAlign);
+
+        let rowColors = new Adw.ExpanderRow({ title: _('自訂顏色') });
+        let rowDColors = new Adw.ExpanderRow({ title: _('暗黑模式') });
+        let rowDBGColor = new Adw.ActionRow({ title: _('背景色') });
+        rowDBGColor.add_suffix(cDBGColor);
+        let rowDFGColor = new Adw.ActionRow({ title: _('前景色') });
+        rowDFGColor.add_suffix(cDFGColor);
+        rowDColors.add_row(rowDBGColor);
+        // rowDColors.add_row(rowDFGColor);
+        let rowLColors = new Adw.ExpanderRow({ title: _('明亮模式') });
+        let rowLBGColor = new Adw.ActionRow({ title: _('背景色') });
+        rowLBGColor.add_suffix(cLBGColor);
+        let rowLFGColor = new Adw.ActionRow({ title: _('前景色') });
+        rowLFGColor.add_suffix(cLFGColor);
+        rowLColors.add_row(rowLBGColor);
+        // rowLColors.add_row(rowLFGColor);
+        let rowColorsUseInStatic = new Adw.ActionRow({ title: _('應用於實體模式') });
+        rowColorsUseInStatic.add_suffix(sUseInStatic);
+        rowColors.add_row(rowDColors);
+        rowColors.add_row(rowLColors);
+        rowColors.add_row(rowColorsUseInStatic);
+        gAppearance.add(rowColors);
 
         // 動畫設定
         const gAnime = new Adw.PreferencesGroup({ title: _("動畫設定") });

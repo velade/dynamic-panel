@@ -50,6 +50,24 @@ msgstr ""
 msgid "對齊方式"
 msgstr ""
 
+msgid "自訂顏色"
+msgstr ""
+
+msgid "暗黑模式"
+msgstr ""
+
+msgid "明亮模式"
+msgstr ""
+
+msgid "背景色"
+msgstr ""
+
+msgid "前景色"
+msgstr ""
+
+msgid "應用於實體模式"
+msgstr ""
+
 msgid "動畫設定"
 msgstr ""
 

@@ -49,6 +49,24 @@ msgstr "Side Margin (px)"
 msgid "對齊方式"
 msgstr "Align"
 
+msgid "自訂顏色"
+msgstr "Custom Colors"
+
+msgid "暗黑模式"
+msgstr "Dark Mode"
+
+msgid "明亮模式"
+msgstr "Light Mode"
+
+msgid "背景色"
+msgstr "Background Color"
+
+msgid "前景色"
+msgstr "Foreground Color"
+
+msgid "應用於實體模式"
+msgstr "Apply to entity mode"
+
 msgid "動畫設定"
 msgstr "Animation"
 

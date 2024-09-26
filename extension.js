@@ -15,7 +15,10 @@ export default class DynamicPanelExtension extends Extension {
         this._actorSignalIds = null;
         this._windowSignalIds = null;
         this._delayedTimeoutId = null;
-        this._ani = null;
+        this.bgcolor = [];
+        this.fgcolor = [];
+        this.ani = null;
+        this.ani2 = null;
     }
 
     enable() {
@@ -23,16 +26,23 @@ export default class DynamicPanelExtension extends Extension {
         this._actorSignalIds = new Map();
         this._windowSignalIds = new Map();
 
+        this._animations = new Map();
+
         // 讀取設定並開始監控變化
         this._settings = this.getSettings();
         this._actorSignalIds.set(this._settings, [
-            this._settings.connect("changed::transparent", () => { this._updatePanelSingleStyle("transparent") }),
+            this._settings.connect("changed::transparent", () => { this._updatePanelSingleStyle("bg-changed") }),
             this._settings.connect("changed::transparent-menus", () => { this._updatePanelSingleStyle("transparent-menus") }),
             this._settings.connect("changed::radius-times", () => { this._updatePanelSingleStyle("radius-times") }),
-            this._settings.connect("changed::float-width", () => { this._updatePanelSingleStyle("float-width") }),
-            this._settings.connect("changed::float-align", () => { this._updatePanelSingleStyle("float-align") }),
-            this._settings.connect("changed::top-margin", () => { this._updatePanelSingleStyle("top-margin") }),
-            this._settings.connect("changed::side-margin", () => { this._updatePanelSingleStyle("side-margin") })
+            this._settings.connect("changed::float-width", () => { this._updatePanelSingleStyle("allocation-changed") }),
+            this._settings.connect("changed::float-align", () => { this._updatePanelSingleStyle("allocation-changed") }),
+            this._settings.connect("changed::top-margin", () => { this._updatePanelSingleStyle("allocation-changed") }),
+            this._settings.connect("changed::side-margin", () => { this._updatePanelSingleStyle("allocation-changed") }),
+            this._settings.connect("changed::dark-bg-color", () => { this._updatePanelSingleStyle("color-changed") }),
+            this._settings.connect("changed::dark-fg-color", () => { this._updatePanelSingleStyle("color-changed") }),
+            this._settings.connect("changed::light-bg-color", () => { this._updatePanelSingleStyle("color-changed") }),
+            this._settings.connect("changed::light-fg-color", () => { this._updatePanelSingleStyle("color-changed") }),
+            this._settings.connect("changed::colors-use-in-static", () => { this._updatePanelSingleStyle("bg-changed") })
         ])
 
         // 監控總覽界面顯示狀態
@@ -60,11 +70,13 @@ export default class DynamicPanelExtension extends Extension {
         // 監控系統暗黑模式變化
         let settings = new Gio.Settings({ schema: "org.gnome.desktop.interface" });
         this._actorSignalIds.set(settings, [
-            settings.connect("changed::color-scheme", this._updatePanelTheme.bind(this))
+            settings.connect("changed::color-scheme", () => { this._updatePanelSingleStyle("bg-changed") })
         ])
 
+        // 更新顏色設定
+        this._updateColorSettings();
+
         // 首次應用主題和樣式
-        this._updatePanelTheme();
         this._updatePanelStyle();
     }
 
@@ -93,30 +105,26 @@ export default class DynamicPanelExtension extends Extension {
         this._windowSignalIds = null;
         this._delayedTimeoutId = null;
         this._settings = null;
+        this.bgcolor = null;
+        this.fgcolor = null;
+        this.ani = null;
+        this.ani2 = null;
 
         // -- 清除面板樣式
-        Main.panel.set_style("");
-        Main.panel.remove_style_class_name("dark");
         Main.panel.remove_style_class_name(this.floatingPanelClass);
-        for (let index = 0; index <= 100; index++) {
-            Main.panel.remove_style_class_name(`${this.floatingPanelClass}-${index}`);
-        }
+        Main.panel.set_style("");
 
         // -- 清除面板選單樣式
         for (const pmenu of Main.uiGroup.get_children()) {
             if (!!pmenu.has_style_class_name &&
                 pmenu.has_style_class_name("panel-menu")
             ) {
-                for (let index = 0; index <= 100; index++) {
-                    pmenu.remove_style_class_name(`${this.floatingPanelMenuClass}-${index}`);
-                }
-                pmenu.remove_style_class_name("dark");
+                pmenu.remove_style_class_name(this.floatingPanelMenuClass);
+                pmenu.set_style("");
             }
         }
 
-        // -- 清除動畫計時器
-        clearInterval(this._ani);
-        this._ani = null;
+        // -- 清除動畫計時器: 動畫執行完會將動畫計時器停止，這裡提前停止會導致Panel歸位異常。
     }
 
     // 窗口添加事件
@@ -138,12 +146,26 @@ export default class DynamicPanelExtension extends Extension {
 
     // 切換worksapce時延遲判定
     _updatePanelStyleDelayed() {
-        GLib.timeout_clear(this._delayedTimeoutId);
+        GLib.Source.remove(this._delayedTimeoutId);
         this._delayedTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
             this._updatePanelStyle();
             this._delayedTimeoutId = null;
             return GLib.SOURCE_REMOVE;
         });
+    }
+
+    // 更新顏色設定
+    _updateColorSettings() {
+        let D_BGC = this._settings.get_string('dark-bg-color');
+        let D_FGC = this._settings.get_string('dark-fg-color');
+        let L_BGC = this._settings.get_string('light-bg-color');
+        let L_FGC = this._settings.get_string('light-fg-color');
+        D_BGC = D_BGC.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+        D_FGC = D_FGC.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+        L_BGC = L_BGC.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+        L_FGC = L_FGC.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+        this.bgcolor = [[D_BGC[1], D_BGC[2], D_BGC[3]], [L_BGC[1], L_BGC[2], L_BGC[3]]];
+        this.fgcolor = [[D_FGC[1], D_FGC[2], D_FGC[3]], [L_FGC[1], L_FGC[2], L_FGC[3]]];
     }
 
     // 是否為暗黑模式
@@ -170,35 +192,48 @@ export default class DynamicPanelExtension extends Extension {
         return !isNearEnough;
     }
 
-    // 更新panel和panel-menu的主題（是否為暗黑模式）
-    _updatePanelTheme() {
-        if (this._isDarkMode()) {
-            Main.panel.add_style_class_name("dark");
-            for (const pmenu of Main.uiGroup.get_children()) {
-                if (!!pmenu.has_style_class_name &&
-                    pmenu.has_style_class_name("panel-menu")
-                ) {
-                    pmenu.add_style_class_name("dark")
-                }
+    // 獲取現有樣式
+    _getStyle(obj) {
+        const style = obj.get_style();
+        const propertiesAndValues = new Object();
+        if (style) {
+            const regex = /\s*([^:;]+)\s*:\s*([^;]+)\s*;?/g;
+            const matches = style.matchAll(regex);
+            for (const match of matches) {
+                const property = match[1].trim();
+                const value = match[2].trim();
+                propertiesAndValues[property] = value;
             }
-        } else {
-            Main.panel.remove_style_class_name("dark");
-            for (const pmenu of Main.uiGroup.get_children()) {
-                if (!!pmenu.has_style_class_name &&
-                    pmenu.has_style_class_name("panel-menu")
-                ) {
-                    pmenu.remove_style_class_name("dark")
-                }
-            }
+            return propertiesAndValues;
         }
+        return {};
+    }
+    // 更新單個樣式
+    _updateStyle(obj, prop, value) {
+        // 獲取現有樣式
+        const propertiesAndValues = this._getStyle(obj);
+        // 更新新樣式並設定回
+        let newStyle = [];
+        propertiesAndValues[prop] = value;
+        for (const property in propertiesAndValues) {
+            const value = propertiesAndValues[property];
+            newStyle.push(`${property}: ${value};`);
+        }
+        newStyle = newStyle.join(" ");
+        obj.set_style(newStyle);
     }
 
     // 更新單獨樣式
     _updatePanelSingleStyle(propname) {
         const floating = this._isFloating();
         switch (propname) {
-            case "transparent":
-                this._setPanelTransparent(floating);
+            case "color-changed":
+                this._updateColorSettings();
+                this._setPanelBackground(floating);
+                break;
+            case "bg-changed":
+                this._setPanelBackground(floating);
+                this._setPanelMenuStyle(floating);
                 break;
             case "transparent-menus":
                 this._setPanelMenuStyle(floating);
@@ -206,10 +241,7 @@ export default class DynamicPanelExtension extends Extension {
             case "radius-times":
                 this._setPanelRadius(floating);
                 break;
-            case "float-width":
-            case "float-align":
-            case "top-margin":
-            case "side-margin":
+            case "allocation-changed":
                 this._setPanelAllocation(floating);
                 break;
         }
@@ -219,7 +251,7 @@ export default class DynamicPanelExtension extends Extension {
     _updatePanelStyle(forceUpdate = false, forceFloating = null) {
         if (typeof forceUpdate != "boolean") forceUpdate = false;
         if (Main.panel.has_style_pseudo_class("overview")) {
-            this._setPanelTransparent(false);
+            this._setPanelBackground(false);
             this._setPanelMenuStyle(false);
             this._setPanelAllocation(false);
             this._setPanelRadius(false);
@@ -235,47 +267,71 @@ export default class DynamicPanelExtension extends Extension {
             (floating && !Main.panel.has_style_class_name(this.floatingPanelClass)) || // 應該懸浮但未懸浮
             (!floating && Main.panel.has_style_class_name(this.floatingPanelClass))// 不應該懸浮但懸浮
         ) {
-            this._setPanelTransparent(floating);
+            this._setPanelBackground(floating);
             this._setPanelMenuStyle(floating);
             this._setPanelAllocation(floating);
             this._setPanelRadius(floating);
         } else if (forceUpdate) {
             if (forceFloating === null) forceFloating = this._isFloating();
-            this._setPanelTransparent(forceFloating);
+            this._setPanelBackground(forceFloating);
             this._setPanelMenuStyle(forceFloating);
             this._setPanelAllocation(forceFloating);
             this._setPanelRadius(forceFloating);
         }
     }
 
-    // 設定面板透明度
-    _setPanelTransparent(floating) {
-        if (floating) {
-            Main.panel.add_style_class_name(this.floatingPanelClass);
-            Main.panel.add_style_class_name(`${this.floatingPanelClass}-${this._settings.get_int("transparent")}`);
-            for (let i = 0; i <= 100; i++) {
-                if (i == this._settings.get_int("transparent")) continue;
-                Main.panel.remove_style_class_name(`${this.floatingPanelClass}-${i}`);
+    // 設定面板背景
+    _setPanelBackground(floating) {
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
+            const _transparent = this._settings.get_int("transparent") / 100;
+            if (floating) {
+                Main.panel.add_style_class_name(this.floatingPanelClass);
+                if (this._isDarkMode()) {
+                    this._updateStyle(Main.panel, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
+                } else {
+                    this._updateStyle(Main.panel, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
+                }
+            } else if (this._settings.get_boolean("colors-use-in-static")) {
+                Main.panel.remove_style_class_name(this.floatingPanelClass);
+                if (this._isDarkMode()) {
+                    this._updateStyle(Main.panel, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, 1)`);
+                } else {
+                    this._updateStyle(Main.panel, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, 1)`);
+                }
+            } else {
+                Main.panel.remove_style_class_name(this.floatingPanelClass);
+                Main.panel.set_style("");
             }
-        } else {
-            for (let i = 0; i <= 100; i++) {
-                Main.panel.remove_style_class_name(`${this.floatingPanelClass}-${i}`);
-            }
-            Main.panel.remove_style_class_name(this.floatingPanelClass);
-        }
+        })
     }
 
     // 設定面板選單樣式
     _setPanelMenuStyle(floating) {
+        const _transparent = this._settings.get_int("transparent") / 100;
         if (this._settings.get_boolean("transparent-menus") && floating) {
             for (const pmenu of Main.uiGroup.get_children()) {
                 if (!!pmenu.has_style_class_name &&
                     pmenu.has_style_class_name("panel-menu")
                 ) {
-                    pmenu.add_style_class_name(`${this.floatingPanelMenuClass}-${this._settings.get_int("transparent")}`);
-                    for (let index = 0; index <= 100; index++) {
-                        if (index == this._settings.get_int("transparent")) continue;
-                        pmenu.remove_style_class_name(`${this.floatingPanelMenuClass}-${index}`);
+                    pmenu.add_style_class_name(this.floatingPanelMenuClass);
+                    if (this._isDarkMode()) {
+                        this._updateStyle(pmenu, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
+                    } else {
+                        this._updateStyle(pmenu, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
+                    }
+                }
+            }
+        } else if (this._settings.get_boolean("colors-use-in-static")) {
+            for (const pmenu of Main.uiGroup.get_children()) {
+                if (!!pmenu.has_style_class_name &&
+                    pmenu.has_style_class_name("panel-menu")
+                ) {
+                    if (this._isDarkMode()) {
+                        this._updateStyle(pmenu, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, 1)`);
+                        this._updateStyle(pmenu, "color", `rgb(${this.fgcolor[0][0]}, ${this.fgcolor[0][1]}, ${this.fgcolor[0][2]})`);
+                    } else {
+                        this._updateStyle(pmenu, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, 1)`);
+                        this._updateStyle(pmenu, "color", `rgb(${this.fgcolor[1][0]}, ${this.fgcolor[1][1]}, ${this.fgcolor[1][2]})`);
                     }
                 }
             }
@@ -284,9 +340,7 @@ export default class DynamicPanelExtension extends Extension {
                 if (!!pmenu.has_style_class_name &&
                     pmenu.has_style_class_name("panel-menu")
                 ) {
-                    for (let index = 0; index <= 100; index++) {
-                        pmenu.remove_style_class_name(`${this.floatingPanelMenuClass}-${index}`);
-                    }
+                    pmenu.set_style("");
                 }
             }
         }
@@ -339,9 +393,9 @@ export default class DynamicPanelExtension extends Extension {
         const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         const panelHeight = Main.panel.get_height() / 2 * (this._settings.get_int("radius-times") / 100) * scale;
 
-        if (this._ani) clearInterval(this._ani);
+        GLib.Source.remove(this._ani);
         let progress = 0;
-        this._ani = setInterval(() => {
+        this._ani = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
             let currentTime = new Date().getTime();
             let elapsedTime = currentTime - startTime;
             progress = Math.min(elapsedTime / duration, 1);
@@ -352,12 +406,11 @@ export default class DynamicPanelExtension extends Extension {
                 currentValue = 1 - progress;
             }
 
-            Main.panel.set_style(`border-radius: ${panelHeight * currentValue}px;`);
+            this._updateStyle(Main.panel, `border-radius`, `${panelHeight * currentValue}px`);
 
-            if (progress >= 1) {
-                clearInterval(this._ani);
-                this._ani = null;
+            if (progress < 1) {
+                return true;
             }
-        }, 16.7)
+        })
     }
 }
