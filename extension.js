@@ -284,7 +284,10 @@ export default class DynamicPanelExtension extends Extension {
     _setPanelBackground(floating) {
         GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
             const _transparent = this._settings.get_int("transparent") / 100;
-            if (floating) {
+            if (Main.panel.has_style_pseudo_class("overview")) {
+                Main.panel.remove_style_class_name(this.floatingPanelClass);
+                this._updateStyle(Main.panel, "background-color", `rgba(0, 0, 0, 0)`);
+            } else if (floating) {
                 Main.panel.add_style_class_name(this.floatingPanelClass);
                 if (this._isDarkMode()) {
                     this._updateStyle(Main.panel, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
