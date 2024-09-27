@@ -90,15 +90,15 @@ export default class DynamicPanelExtension extends Extension {
             }
         }
 
-        // 清除延遲計時器
-        if (this._delayedTimeoutId != null) {
-            GLib.Source.remove(this._delayedTimeoutId);
-        }
-
         // 設定為false，恢復到默認樣式，帶動畫用以優雅退場。（此時所有附加內容就應該已經被清除了）
         this._updatePanelStyle(true, false);
 
         // 二次清理確保附加的內容被清除
+
+        // -- 清除動畫計時器
+        GLib.Source.remove(this._delayedTimeoutId);
+        GLib.Source.remove(this._ani);
+        GLib.Source.remove(this._ani2);
 
         // -- 清除基本變量
         this._actorSignalIds = null;
@@ -120,11 +120,10 @@ export default class DynamicPanelExtension extends Extension {
                 pmenu.has_style_class_name("panel-menu")
             ) {
                 pmenu.remove_style_class_name(this.floatingPanelMenuClass);
-                pmenu.set_style("");
+                pmenu._delegate.box.set_style("");
             }
         }
 
-        // -- 清除動畫計時器: 動畫執行完會將動畫計時器停止，這裡提前停止會導致Panel歸位異常。
     }
 
     // 窗口添加事件
@@ -282,7 +281,7 @@ export default class DynamicPanelExtension extends Extension {
 
     // 設定面板背景
     _setPanelBackground(floating) {
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
+        this.ani2 = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
             const _transparent = this._settings.get_int("transparent") / 100;
             if (Main.panel.has_style_pseudo_class("overview")) {
                 Main.panel.remove_style_class_name(this.floatingPanelClass);
@@ -316,11 +315,12 @@ export default class DynamicPanelExtension extends Extension {
                 if (!!pmenu.has_style_class_name &&
                     pmenu.has_style_class_name("panel-menu")
                 ) {
+
                     pmenu.add_style_class_name(this.floatingPanelMenuClass);
                     if (this._isDarkMode()) {
-                        this._updateStyle(pmenu, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
+                        this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
                     } else {
-                        this._updateStyle(pmenu, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
+                        this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
                     }
                 }
             }
@@ -330,11 +330,11 @@ export default class DynamicPanelExtension extends Extension {
                     pmenu.has_style_class_name("panel-menu")
                 ) {
                     if (this._isDarkMode()) {
-                        this._updateStyle(pmenu, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, 1)`);
-                        this._updateStyle(pmenu, "color", `rgb(${this.fgcolor[0][0]}, ${this.fgcolor[0][1]}, ${this.fgcolor[0][2]})`);
+                        this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, 1)`);
+                        this._updateStyle(pmenu._delegate.box, "color", `rgb(${this.fgcolor[0][0]}, ${this.fgcolor[0][1]}, ${this.fgcolor[0][2]})`);
                     } else {
-                        this._updateStyle(pmenu, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, 1)`);
-                        this._updateStyle(pmenu, "color", `rgb(${this.fgcolor[1][0]}, ${this.fgcolor[1][1]}, ${this.fgcolor[1][2]})`);
+                        this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, 1)`);
+                        this._updateStyle(pmenu._delegate.box, "color", `rgb(${this.fgcolor[1][0]}, ${this.fgcolor[1][1]}, ${this.fgcolor[1][2]})`);
                     }
                 }
             }
@@ -343,7 +343,7 @@ export default class DynamicPanelExtension extends Extension {
                 if (!!pmenu.has_style_class_name &&
                     pmenu.has_style_class_name("panel-menu")
                 ) {
-                    pmenu.set_style("");
+                    pmenu._delegate.box.set_style("");
                 }
             }
         }
