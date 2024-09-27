@@ -1,0 +1,76 @@
+# Czech translation for Dynamic Panel.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Amerey <info@amerey.eu>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-07 15:14+0800\n"
+"PO-Revision-Date: 2024-09-26 11:07+0200\n"
+"Last-Translator: Amerey <info@amerey.eu>\n"
+"Language-Team: \n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.4\n"
+
+msgid "外觀設定"
+msgstr "Vzhled"
+
+msgid "左側"
+msgstr "Vlevo"
+
+msgid "居中"
+msgstr "Střed"
+
+msgid "右側"
+msgstr "Vpravo"
+
+msgid "不透明度 (%)"
+msgstr "Průhlednost (%)"
+
+msgid "選單透明"
+msgstr "Transparentní menu"
+
+msgid "面板圓角 (%)"
+msgstr "Poloměr ohraničení (%)"
+
+msgid "浮動長度 (%)"
+msgstr "Pohyblivá šířka (%)"
+
+msgid "頂部邊距 (px)"
+msgstr "Horní okraj (px)"
+
+msgid "側面邊距 (px)"
+msgstr "Boční okraj (px)"
+
+msgid "對齊方式"
+msgstr "Zarovnat"
+
+msgid "自訂顏色"
+msgstr "Vlastní barvy"
+
+msgid "暗黑模式"
+msgstr "Tmavý režim"
+
+msgid "明亮模式"
+msgstr "Světlý režim"
+
+msgid "背景色"
+msgstr "Barva pozadí"
+
+msgid "前景色"
+msgstr "Barva popředí"
+
+msgid "應用於實體模式"
+msgstr "Použít na režim entity"
+
+msgid "動畫設定"
+msgstr "Animace"
+
+msgid "動畫時長 (ms)"
+msgstr "Doba trvání (ms)"
