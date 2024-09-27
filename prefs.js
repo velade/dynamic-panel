@@ -219,14 +219,14 @@ export default class extends ExtensionPreferences {
         let rowDFGColor = new Adw.ActionRow({ title: _('前景色') });
         rowDFGColor.add_suffix(cDFGColor);
         rowDColors.add_row(rowDBGColor);
-        // rowDColors.add_row(rowDFGColor);
+        rowDColors.add_row(rowDFGColor);
         let rowLColors = new Adw.ExpanderRow({ title: _('明亮模式') });
         let rowLBGColor = new Adw.ActionRow({ title: _('背景色') });
         rowLBGColor.add_suffix(cLBGColor);
         let rowLFGColor = new Adw.ActionRow({ title: _('前景色') });
         rowLFGColor.add_suffix(cLFGColor);
         rowLColors.add_row(rowLBGColor);
-        // rowLColors.add_row(rowLFGColor);
+        rowLColors.add_row(rowLFGColor);
         let rowColorsUseInStatic = new Adw.ActionRow({ title: _('應用於實體模式') });
         rowColorsUseInStatic.add_suffix(sUseInStatic);
         rowColors.add_row(rowDColors);

@@ -19,6 +19,7 @@ export default class DynamicPanelExtension extends Extension {
         this.fgcolor = [];
         this.ani = null;
         this.ani2 = null;
+        this._panelButtons = [];
     }
 
     enable() {
@@ -73,8 +74,21 @@ export default class DynamicPanelExtension extends Extension {
             settings.connect("changed::color-scheme", () => { this._updatePanelSingleStyle("bg-changed") })
         ])
 
+        // 監控Panel內容變化
+        this._actorSignalIds.set(Main.panel, [
+            Main.panel._leftBox.connect("child-added", this._updatePanelButtons.bind(this)),
+            Main.panel._leftBox.connect("child-removed", this._updatePanelButtons.bind(this)),
+            Main.panel._centerBox.connect("child-added", this._updatePanelButtons.bind(this)),
+            Main.panel._centerBox.connect("child-removed", this._updatePanelButtons.bind(this)),
+            Main.panel._rightBox.connect("child-added", this._updatePanelButtons.bind(this)),
+            Main.panel._rightBox.connect("child-removed", this._updatePanelButtons.bind(this))
+        ]);
+
         // 更新顏色設定
         this._updateColorSettings();
+
+        // 更新panelButtons
+        this._updatePanelButtons();
 
         // 首次應用主題和樣式
         this._updatePanelStyle();
@@ -113,6 +127,17 @@ export default class DynamicPanelExtension extends Extension {
         // -- 清除面板樣式
         Main.panel.remove_style_class_name(this.floatingPanelClass);
         Main.panel.set_style("");
+
+        // -- 清除面板前景色
+        for (const element of this._panelButtons) {
+            if(element) {
+                element.set_style("");
+            }
+        }
+        for(const dot of Main.panel._leftBox.get_children()[0].get_children()[0].get_children()[0].get_children()) {
+            dot._dot.set_style("");
+        }
+        this._panelButtons = null;
 
         // -- 清除面板選單樣式
         for (const pmenu of Main.uiGroup.get_children()) {
@@ -222,6 +247,19 @@ export default class DynamicPanelExtension extends Extension {
         obj.set_style(newStyle);
     }
 
+    _updatePanelButtons() {
+        for (const box of [Main.panel._leftBox, Main.panel._centerBox, Main.panel._rightBox]) {
+            for (const child0 of box.get_children()) {
+                if (!child0.get_children) continue;
+                for (const child1 of child0.get_children()) {
+                    if (child1.has_style_class_name && child1.has_style_class_name("panel-button")) {
+                        this._panelButtons.push(child1);
+                    }
+                }
+            }
+        }
+    }
+
     // 更新單獨樣式
     _updatePanelSingleStyle(propname) {
         const floating = this._isFloating();
@@ -229,9 +267,11 @@ export default class DynamicPanelExtension extends Extension {
             case "color-changed":
                 this._updateColorSettings();
                 this._setPanelBackground(floating);
+                this._setPanelForeground(floating);
                 break;
             case "bg-changed":
                 this._setPanelBackground(floating);
+                this._setPanelForeground(floating);
                 this._setPanelMenuStyle(floating);
                 break;
             case "transparent-menus":
@@ -251,6 +291,7 @@ export default class DynamicPanelExtension extends Extension {
         if (typeof forceUpdate != "boolean") forceUpdate = false;
         if (Main.panel.has_style_pseudo_class("overview")) {
             this._setPanelBackground(false);
+            this._setPanelForeground(false);
             this._setPanelMenuStyle(false);
             this._setPanelAllocation(false);
             this._setPanelRadius(false);
@@ -267,12 +308,14 @@ export default class DynamicPanelExtension extends Extension {
             (!floating && Main.panel.has_style_class_name(this.floatingPanelClass))// 不應該懸浮但懸浮
         ) {
             this._setPanelBackground(floating);
+            this._setPanelForeground(floating);
             this._setPanelMenuStyle(floating);
             this._setPanelAllocation(floating);
             this._setPanelRadius(floating);
         } else if (forceUpdate) {
             if (forceFloating === null) forceFloating = this._isFloating();
             this._setPanelBackground(forceFloating);
+            this._setPanelForeground(forceFloating);
             this._setPanelMenuStyle(forceFloating);
             this._setPanelAllocation(forceFloating);
             this._setPanelRadius(forceFloating);
@@ -283,6 +326,7 @@ export default class DynamicPanelExtension extends Extension {
     _setPanelBackground(floating) {
         this.ani2 = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
             const _transparent = this._settings.get_int("transparent") / 100;
+
             if (Main.panel.has_style_pseudo_class("overview")) {
                 Main.panel.remove_style_class_name(this.floatingPanelClass);
                 this._updateStyle(Main.panel, "background-color", `rgba(0, 0, 0, 0)`);
@@ -305,6 +349,27 @@ export default class DynamicPanelExtension extends Extension {
                 Main.panel.set_style("");
             }
         })
+    }
+
+    // 設定面板前景
+    _setPanelForeground(floating) {
+        const colorSet = this._isDarkMode() ? 0 : 1;
+
+        if (floating || this._settings.get_boolean("colors-use-in-static")) {
+            for (const element of this._panelButtons) {
+                this._updateStyle(element, "color", `rgb(${this.fgcolor[colorSet][0]}, ${this.fgcolor[colorSet][1]}, ${this.fgcolor[colorSet][2]})`);
+            }
+            for(const dot of Main.panel._leftBox.get_children()[0].get_children()[0].get_children()[0].get_children()) {
+                this._updateStyle(dot._dot, "background-color", `rgb(${this.fgcolor[colorSet][0]}, ${this.fgcolor[colorSet][1]}, ${this.fgcolor[colorSet][2]})`);
+            }
+        } else {
+            for (const element of this._panelButtons) {
+                element.set_style("");
+            }
+            for(const dot of Main.panel._leftBox.get_children()[0].get_children()[0].get_children()[0].get_children()) {
+                dot._dot.set_style("");
+            }
+        }
     }
 
     // 設定面板選單樣式
