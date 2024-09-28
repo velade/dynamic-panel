@@ -29,6 +29,8 @@ export default class DynamicPanelExtension extends Extension {
 
         this._animations = new Map();
 
+        this._panelButtons = [];
+
         // 讀取設定並開始監控變化
         this._settings = this.getSettings();
         this._actorSignalIds.set(this._settings, [
@@ -130,11 +132,11 @@ export default class DynamicPanelExtension extends Extension {
 
         // -- 清除面板前景色
         for (const element of this._panelButtons) {
-            if(element) {
+            if (element) {
                 element.set_style("");
             }
         }
-        for(const dot of Main.panel._leftBox.get_children()[0].get_children()[0].get_children()[0].get_children()) {
+        for (const dot of Main.panel._leftBox.get_children()[0].get_children()[0].get_children()[0].get_children()) {
             dot._dot.set_style("");
         }
         this._panelButtons = null;
@@ -247,6 +249,7 @@ export default class DynamicPanelExtension extends Extension {
         obj.set_style(newStyle);
     }
 
+    // 更新面板按鈕列表
     _updatePanelButtons() {
         for (const box of [Main.panel._leftBox, Main.panel._centerBox, Main.panel._rightBox]) {
             for (const child0 of box.get_children()) {
@@ -313,7 +316,7 @@ export default class DynamicPanelExtension extends Extension {
             this._setPanelAllocation(floating);
             this._setPanelRadius(floating);
         } else if (forceUpdate) {
-            if (forceFloating === null) forceFloating = this._isFloating();
+            if (forceFloating === null) forceFloating = floating;
             this._setPanelBackground(forceFloating);
             this._setPanelForeground(forceFloating);
             this._setPanelMenuStyle(forceFloating);
@@ -359,14 +362,14 @@ export default class DynamicPanelExtension extends Extension {
             for (const element of this._panelButtons) {
                 this._updateStyle(element, "color", `rgb(${this.fgcolor[colorSet][0]}, ${this.fgcolor[colorSet][1]}, ${this.fgcolor[colorSet][2]})`);
             }
-            for(const dot of Main.panel._leftBox.get_children()[0].get_children()[0].get_children()[0].get_children()) {
+            for (const dot of Main.panel._leftBox.get_children()[0].get_children()[0].get_children()[0].get_children()) {
                 this._updateStyle(dot._dot, "background-color", `rgb(${this.fgcolor[colorSet][0]}, ${this.fgcolor[colorSet][1]}, ${this.fgcolor[colorSet][2]})`);
             }
         } else {
             for (const element of this._panelButtons) {
                 element.set_style("");
             }
-            for(const dot of Main.panel._leftBox.get_children()[0].get_children()[0].get_children()[0].get_children()) {
+            for (const dot of Main.panel._leftBox.get_children()[0].get_children()[0].get_children()[0].get_children()) {
                 dot._dot.set_style("");
             }
         }
