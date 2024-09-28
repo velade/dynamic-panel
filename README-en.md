@@ -2,52 +2,55 @@
 
 # Dynamic Top Panel
 
-Inspired by the floating panel design in KDE Plasma 6, this extension presents a translucent floating bar effect when there are no windows nearby, and switches to a solid panel style when windows approach. It supports both dark and light modes in GNOME. Custom colors can be set separately for dark and light modes.
+Inspired by the floating panel design in KDE Plasma 6, this extension presents a translucent floating bar effect when there are no windows nearby, and switches to a solid panel style when windows approach. It supports Gnome's dark and light mode switching and allowing you to set custom colors for each mode.
 
 ## Floating Mode
-
 ![Floating Mode](readme_images/transparent.png)
+When there are no windows near the Top-Panel, it will enter floating mode, which only has a translucent effect without blurring. Currently, if you want a blur effect, it's recommended to use Blur-my-shell's static pipeline for the panel. Blur-my-shell's dynamic mode doesn't support rounded corners, which is an issue with Blur-my-shell itself.
 
-When there are no windows near the top bar, it enters floating mode. In this mode, it only has a translucent effect without any blur. If you desire a blur effect for now, it's recommended to use Blur my shell's static pipeline for the panel. Blur my shell's dynamic mode doesn't support rounded corners, which is an issue with Blur my shell itself.
+### Blur-my-shell Settings
+![Blur-my-shell Settings](readme_images/bms_settings1.png)
 
-### Blur my shell Settings
+Use the static mode because the dynamic mode doesn't support rounded corners.
 
-![Blur my shell settings](readme_images/bms_settings1.png)
+![Blur-my-shell Pipeline Settings](readme_images/bms_settings2.png)
 
-Use the static effect because the dynamic effect doesn't support rounded corners.
+Remember to add the "Corner" effect to the corresponding pipeline and adjust the radius according to the rounded corners you set in my extension.
 
-![Blur my shell Pipeline settings](readme_images/bms_settings2.png)
+### Preview with Blur-my-shell
+![Blurred Floating Effect](readme_images/blur.png)
 
-Remember to add the "Corner" effect to the corresponding pipeline and set the radius to the maximum (exceeding the value won't have any impact, it will just make it fully rounded).
-
-### Effect when used with Blur my shell
-
-![Effect when used with Blur my shell](readme_images/blur.png)
-
-## Docked/Solid Mode
-
+## Solid Mode
 ![Solid Mode](readme_images/solid.png)
+When any window is close enough (almost touching) to the top panel, the top panel will become a solid panel (similar to the default in Gnome, but it can applys custom colors to it). This allows for better integration with maximized windows, eliminating the "background leakage" phenomenon often seen with themes that keep the panel floating.
 
-When any window gets close enough (almost touching) to the top bar, it will transform into GNOME's default opaque docked bar. This allows for better integration with maximized windows, avoiding the "light leakage" phenomenon often seen with themes that keep the top bar floating.
-
-# Installing the Extension
-
-### 1. Install from Gnome Extensions
-
+# Installation
+### 1. Install from Gnome Extensions site (Recommended)
 Extension link: [https://extensions.gnome.org/extension/7284/dynamic-panel/](https://extensions.gnome.org/extension/7284/dynamic-panel/)
 
-### 2. Install from GitHub
+### 2. Install from GitHub (Not Recommended)
+**Not recommended: The Main branch might be under development for the next version, so it might not work properly yet.**
 
-Clone or download the zip from GitHub to your local machine. Extract all files to the `~/.local/share/gnome-shell/extensions/dynamic-panel@velhlkj.com/` directory (create it if it doesn't exist). Make sure not to nest the files! `extension.js` should be directly within `dynamic-panel@velhlkj.com/`, not inside `dynamic-panel@velhlkj.com/dynamic-panel/`.
-
-The directory structure is fixed, including `dynamic-panel@velhlkj.com`. **Do not change the directory name**, or the extension will not appear in the list and will not take effect. This is because GNOME extensions require the directory name to be consistent with the UUID specified in `metadata.json`.
+1. Choose the latest Tag or your desired version, clone or download the Zip to your computer, or you should go to Releases to download.
+2. Extract all files to `~/.local/share/gnome-shell/extensions/dynamic-panel@velhlkj.com/`
+    * Create the directory if it doesn't exist.
+    * Make sure not to nest the files! `extension.js` should be directly in `dynamic-panel@velhlkj.com`, not in `dynamic-panel@velhlkj.com/dynamic-panel/`.
+    * The path is fixed, including `dynamic-panel@velhlkj.com`. **Do not change the directory name**, otherwise the extension will not be displayed in the list and will not work. This is because Gnome require extensions's directory name to be consistent with the uuid specified in `metadata.json`.
+3. Restart Gnome (Alt-F2, type `r`, and press Enter) or just log out and back in.
+4. Enable the extension in Gnome Extensions.
 
 # About Performance
+Due to Gnome's own css and gjs limitations, CSS3 transition animations are ineffective for most properties! The `requestAnimationFrame` function for animation frame alignment is also unavailable. Therefore, I have to use a fixed frame interval loop for frame-by-frame animation to achieve smooth movement, resizing, and rounded corner animations. This may have some performance impact **during the animation process**. However, there is **no performance impact in a static state**.
 
-Due to limitations in GNOME's CSS and GJS, CSS3 transition animations are surprisingly ineffective for most properties! Also, the `requestAnimationFrame` function for animation frame synchronization is not available. Therefore, we have to use a fixed frame interval loop to achieve smooth movement, resizing, and rounded corner animations. This may have some performance impact **during animations**, but there is **no performance impact in a static state**.
+# About Translations
+* Except for Simplified Chinese, Traditional Chinese (Taiwan), and English, which are maintained by the me (Velade), other translations are mainly from contributors.
+* As I don't understand other languages, when translations other than the above-mentioned languages have entries added/changed, I will use Gemini AI for translation and supplementation/modification instead of leaving them blank. However, the accuracy of the translation and whether it's the most appropriate choice cannot be guaranteed.
 
-# Special Thanks
+# Translation Contributors (in no particular order)
+* [Aleksandr Shamaraev](https://github.com/AlexanderShad) - Russian
+* [Amerey](https://github.com/Amereyeu) - Czech
 
-**Thanks to the transparent-top-bar extension for its inspiration. As I'm new to GJS, the implementation of window proximity detection was largely based on the source code of transparent-top-bar. Without this code as a reference, this extension would have been difficult to achieve.**
+# Special Thanks (in no particular order)
+* **Thanks to Gonzague/Paul Fauchon's Transparent Top Bar (Adjustable transparency) extension for the idea. The implementation of window proximity detection in this extension heavily references this extension.**
 
-**Thanks to Google Gemini for its assistance during the research process.**
+* **Thanks to Google Gemini for its assistance in researching and learning Gjs.**
