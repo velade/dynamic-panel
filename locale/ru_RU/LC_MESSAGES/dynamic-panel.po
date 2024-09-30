@@ -92,3 +92,21 @@ msgstr "Сохранять прозрачность в сплошном режи
 
 msgid "敬請期待"
 msgstr "Ожидайте"
+
+msgid "靠近"
+msgstr "Закрыть окно"
+
+msgid "僅最大化"
+msgstr "Только максимизировать"
+
+msgid "整體"
+msgstr "Весь"
+
+msgid "區域"
+msgstr "Область"
+
+msgid "停靠"
+msgstr "Пристыковать"
+
+msgid "隱藏"
+msgstr "Скрыть"

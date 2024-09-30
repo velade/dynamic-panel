@@ -93,3 +93,21 @@ msgstr "实体模式保持透明度"
 
 msgid "敬請期待"
 msgstr "敬请期待"
+
+msgid "靠近"
+msgstr "窗口靠近"
+
+msgid "僅最大化"
+msgstr "仅最大化"
+
+msgid "整體"
+msgstr "整体"
+
+msgid "區域"
+msgstr "区域"
+
+msgid "停靠"
+msgstr "停靠"
+
+msgid "隱藏"
+msgstr "隐藏"

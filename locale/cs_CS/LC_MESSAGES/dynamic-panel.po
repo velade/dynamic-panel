@@ -95,3 +95,21 @@ msgstr "Zachovat průhlednost v pevném režimu"
 
 msgid "敬請期待"
 msgstr "Již brzy"
+
+msgid "靠近"
+msgstr "Zavřít okno"
+
+msgid "僅最大化"
+msgstr "Pouze maximalizovat"
+
+msgid "整體"
+msgstr "Celkově"
+
+msgid "區域"
+msgstr "Oblast"
+
+msgid "停靠"
+msgstr "Ukotvit"
+
+msgid "隱藏"
+msgstr "Skrýt"

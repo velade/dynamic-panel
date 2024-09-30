@@ -77,19 +77,37 @@ msgid "動畫時長 (ms)"
 msgstr "Duration (ms)"
 
 msgid "檢測方式"
-msgstr "检测方式"
+msgstr "Detection Method"
 
 msgid "背景模式"
-msgstr "背景模式"
+msgstr "Background Mode"
 
 msgid "自動長度"
-msgstr "自动长度"
+msgstr "Auto Width"
 
 msgid "實體類型"
-msgstr "实体类型"
+msgstr "Solid Mode Type"
 
 msgid "實體模式保持透明度"
-msgstr "实体模式保持透明度"
+msgstr "Entity Mode Keep Transparency"
 
 msgid "敬請期待"
-msgstr "敬请期待"
+msgstr "Coming Soon"
+
+msgid "靠近"
+msgstr "Window Close"
+
+msgid "僅最大化"
+msgstr "Maximize Only"
+
+msgid "整體"
+msgstr "Overall"
+
+msgid "區域"
+msgstr "Area"
+
+msgid "停靠"
+msgstr "Dock"
+
+msgid "隱藏"
+msgstr "Hide"

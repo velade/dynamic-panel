@@ -94,3 +94,21 @@ msgstr ""
 
 msgid "敬請期待"
 msgstr ""
+
+msgid "靠近"
+msgstr ""
+
+msgid "僅最大化"
+msgstr ""
+
+msgid "整體"
+msgstr ""
+
+msgid "區域"
+msgstr ""
+
+msgid "停靠"
+msgstr ""
+
+msgid "隱藏"
+msgstr ""
