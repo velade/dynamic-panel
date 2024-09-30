@@ -3,92 +3,92 @@
 	<schema id="org.gnome.shell.extensions.dynamic-panel" path="/org/gnome/shell/extensions/dynamic-panel/">
 		<key type="i" name="radius-times">
 			<default>100</default>
-			<summary>corner radius times</summary>
+			<summary>Percentage of rounded corners for the panel in floating mode, 100 is completely round, 0 is no rounded corners</summary>
 			<description/>
 		</key>
 		<key type="i" name="float-width">
 			<default>99</default>
-			<summary>panel width in floatting mode</summary>
+			<summary>The horizontal size (which I'll call "length" or "width" depending on your preference) of the panel when it's in floating mode.</summary>
 			<description/>
 		</key>
 		<key type="i" name="float-align">
 			<default>1</default>
-			<summary>panel align for floatting mode</summary>
+			<summary>Alignment of the panel in floating mode, 0 for left, 1 for center, 2 for right</summary>
 			<description/>
 		</key>
 		<key type="i" name="top-margin">
 			<default>10</default>
-			<summary>the top margin of panel floatting</summary>
+			<summary>The distance between the panel and the top edge of the screen when in floating mode. This setting will not be applied in Solid Mode.</summary>
 			<description/>
 		</key>
 		<key type="i" name="side-margin">
 			<default>10</default>
-			<summary>the side margin of panel floatting</summary>
+			<summary>The distance between the panel and the left or right edge of the screen when in floating mode. Whether it's the left or right edge depends on whether you're left-aligned or right-aligned. This setting is not available when center-aligned.</summary>
 			<description/>
 		</key>
 		<key type="i" name="transparent">
 			<default>75</default>
-			<summary>the transparent of panel floatting</summary>
+			<summary>Opacity in floating mode, 0 is completely transparent, 100 is completely opaque. The panel menu also adheres to this setting.</summary>
 			<description/>
 		</key>
 		<key type="b" name="transparent-menus">
 			<default>true</default>
-			<summary>the transparent applie of panel floatting menus</summary>
+			<summary>The name is a legacy issue. It now actually indicates whether the panel menu should apply the same style as the panel, including color, etc., not just opacity.</summary>
 			<description/>
 		</key>
 		<key type="b" name="transparent-menus-keep-alpha">
 			<default>false</default>
-			<summary>Force menu transparency to remain</summary>
+			<summary>This option indicates whether the panel menu should always remain transparent. By default, it maintains the same transparency as the panel, so it will also become opaque in physical mode. Enabling this option will allow it to remain transparent even in physical mode.</summary>
 			<description/>
 		</key>
 		<key type="i" name="duration">
 			<default>250</default>
-			<summary>The rate of panel transition speed</summary>
+			<summary>Duration of the animation, may not have an effect on the panel background gradient.</summary>
 			<description/>
 		</key>
 		<key type="s" name="dark-bg-color">
 			<default>'rgb(0, 0, 0)'</default>
-			<summary>The background Color string for dark mode</summary>
+			<summary>Custom dark mode background color</summary>
 			<description/>
 		</key>
 		<key type="s" name="dark-fg-color">
 			<default>'rgb(240, 240, 240)'</default>
-			<summary>The foreground Color string for dark mode</summary>
+			<summary>Custom dark mode foreground color</summary>
 			<description/>
 		</key>
 		<key type="s" name="light-bg-color">
 			<default>'rgb(250, 250, 250)'</default>
-			<summary>The background Color string for light mode</summary>
+			<summary>Custom light mode background color</summary>
 			<description/>
 		</key>
 		<key type="s" name="light-fg-color">
 			<default>'rgb(0, 0, 0)'</default>
-			<summary>The foreground Color string for light mode</summary>
+			<summary>Custom light mode foreground color</summary>
 			<description/>
 		</key>
 		<key type="b" name="colors-use-in-static">
 			<default>false</default>
-			<summary>The Colors use in static mode or not </summary>
+			<summary>Whether to apply the custom color to physical mode.</summary>
 			<description/>
 		</key>
 		<key type="i" name="detection-mode">
 			<default>0</default>
-			<summary>How to decide to enter and exit solid mode</summary>
+			<summary>The trigger to switch between Solid Mode and Floating Mode. By default, the panel will switch to Solid Mode when windows is close enough, without needing to maximize it.</summary>
 			<description/>
 		</key>
 		<key type="i" name="background-mode">
 			<default>0</default>
-			<summary>Fill or Area background</summary>
+			<summary>Background style of the panel when floating, 0 for a single background for the entire panel, 1 for applying backgrounds separately to the left, center, and right sections of the panel.</summary>
 			<description/>
 		</key>
 		<key type="b" name="auto-width">
 			<default>false</default>
-			<summary>Auto width or not</summary>
+			<summary>Automatically determine the panel's horizontal size. When enabled, float-width will be unavailable.</summary>
 			<description/>
 		</key>
 		<key type="i" name="solid-type">
 			<default>0</default>
-			<summary>Indicates whether solid mode is docked or hidden</summary>
+			<summary>The type of Solid Mode the panel is in. 0 is a dock similar to the default GNOME panel, 1 will hide the panel.</summary>
 			<description/>
 		</key>
 	</schema>
