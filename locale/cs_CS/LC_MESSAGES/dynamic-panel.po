@@ -18,8 +18,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4.4\n"
 
-msgid "外觀設定"
-msgstr "Vzhled"
+msgid "通用設定"
+msgstr "Obecné nastavení"
+
+msgid "懸浮模式"
+msgstr "Plovoucí režim"
+
+msgid "實體模式"
+msgstr "Pevný režim"
 
 msgid "左側"
 msgstr "Vlevo"
@@ -33,14 +39,14 @@ msgstr "Vpravo"
 msgid "不透明度 (%)"
 msgstr "Průhlednost (%)"
 
-msgid "選單透明"
-msgstr "Transparentní menu"
+msgid "應用面板樣式到面板選單"
+msgstr "Použít styl panelu na nabídku panelu"
 
 msgid "面板圓角 (%)"
 msgstr "Poloměr ohraničení (%)"
 
-msgid "浮動長度 (%)"
-msgstr "Pohyblivá šířka (%)"
+msgid "面板長度 (%)"
+msgstr "Šířka panelu (%)"
 
 msgid "頂部邊距 (px)"
 msgstr "Horní okraj (px)"
@@ -66,11 +72,26 @@ msgstr "Barva pozadí"
 msgid "前景色"
 msgstr "Barva popředí"
 
-msgid "應用於實體模式"
-msgstr "Použít na režim entity"
-
-msgid "動畫設定"
-msgstr "Animace"
+msgid "應用自訂顏色"
+msgstr "Použít vlastní barvy"
 
 msgid "動畫時長 (ms)"
 msgstr "Doba trvání (ms)"
+
+msgid "檢測方式"
+msgstr "Metoda detekce"
+
+msgid "背景模式"
+msgstr "Režim pozadí"
+
+msgid "自動長度"
+msgstr "Automatická délka"
+
+msgid "實體類型"
+msgstr "Typ entity"
+
+msgid "實體模式保持透明度"
+msgstr "Zachovat průhlednost v pevném režimu"
+
+msgid "敬請期待"
+msgstr "Již brzy"

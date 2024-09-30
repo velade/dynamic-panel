@@ -36,16 +36,19 @@ export default class DynamicPanelExtension extends Extension {
         this._actorSignalIds.set(this._settings, [
             this._settings.connect("changed::transparent", () => { this._updatePanelSingleStyle("bg-changed") }),
             this._settings.connect("changed::transparent-menus", () => { this._updatePanelSingleStyle("transparent-menus") }),
+            this._settings.connect("changed::transparent-menus-keep-alpha", () => { this._updatePanelSingleStyle("transparent-menus") }),
             this._settings.connect("changed::radius-times", () => { this._updatePanelSingleStyle("radius-times") }),
             this._settings.connect("changed::float-width", () => { this._updatePanelSingleStyle("allocation-changed") }),
             this._settings.connect("changed::float-align", () => { this._updatePanelSingleStyle("allocation-changed") }),
             this._settings.connect("changed::top-margin", () => { this._updatePanelSingleStyle("allocation-changed") }),
             this._settings.connect("changed::side-margin", () => { this._updatePanelSingleStyle("allocation-changed") }),
+            this._settings.connect("changed::auto-width", () => { this._updatePanelSingleStyle("allocation-changed") }),
             this._settings.connect("changed::dark-bg-color", () => { this._updatePanelSingleStyle("color-changed") }),
             this._settings.connect("changed::dark-fg-color", () => { this._updatePanelSingleStyle("color-changed") }),
             this._settings.connect("changed::light-bg-color", () => { this._updatePanelSingleStyle("color-changed") }),
             this._settings.connect("changed::light-fg-color", () => { this._updatePanelSingleStyle("color-changed") }),
-            this._settings.connect("changed::colors-use-in-static", () => { this._updatePanelSingleStyle("bg-changed") })
+            this._settings.connect("changed::colors-use-in-static", () => { this._updatePanelSingleStyle("bg-changed") }),
+            this._settings.connect("changed::background-mode", () => { this._updatePanelSingleStyle("bg-changed") })
         ])
 
         // 監控總覽界面顯示狀態
@@ -129,6 +132,9 @@ export default class DynamicPanelExtension extends Extension {
         // -- 清除面板樣式
         Main.panel.remove_style_class_name(this.floatingPanelClass);
         Main.panel.set_style("");
+        Main.panel._leftBox.set_style("");
+        Main.panel._centerBox.set_style("");
+        Main.panel._rightBox.set_style("");
 
         // -- 清除面板前景色
         for (const element of this._panelButtons) {
@@ -206,13 +212,22 @@ export default class DynamicPanelExtension extends Extension {
 
         const isNearEnough = activeWorkspace.list_windows().some(metaWindow => {
             const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-            const verticalPosition = metaWindow.get_frame_rect().y;
-            return metaWindow.is_on_primary_monitor()
-                && metaWindow.showing_on_its_workspace()
-                && !metaWindow.is_hidden()
-                && metaWindow.get_window_type() !== Meta.WindowType.DESKTOP
-                && !metaWindow.skip_taskbar
-                && verticalPosition < (this._settings.get_int("top-margin") + Main.layoutManager.panelBox.get_height() + 5) * scale;
+            if (this._settings.get_int('detection-mode') === 1) {
+                return metaWindow.is_on_primary_monitor()
+                    && metaWindow.showing_on_its_workspace()
+                    && !metaWindow.is_hidden()
+                    && metaWindow.get_window_type() !== Meta.WindowType.DESKTOP
+                    && !metaWindow.skip_taskbar
+                    && (metaWindow.get_maximized() == 3 || metaWindow.get_maximized() == 2);
+            } else {
+                const verticalPosition = metaWindow.get_frame_rect().y;
+                return metaWindow.is_on_primary_monitor()
+                    && metaWindow.showing_on_its_workspace()
+                    && !metaWindow.is_hidden()
+                    && metaWindow.get_window_type() !== Meta.WindowType.DESKTOP
+                    && !metaWindow.skip_taskbar
+                    && verticalPosition < (this._settings.get_int("top-margin") + Main.layoutManager.panelBox.get_height() + 5) * scale;
+            }
         });
 
         return !isNearEnough;
@@ -266,13 +281,20 @@ export default class DynamicPanelExtension extends Extension {
     // 更新單獨樣式
     _updatePanelSingleStyle(propname) {
         const floating = this._isFloating();
+        const bg_areas = [Main.panel._leftBox, Main.panel._centerBox, Main.panel._rightBox];
         switch (propname) {
             case "color-changed":
+                for (const bg_area of bg_areas) {
+                    bg_area.set_style("");
+                }
                 this._updateColorSettings();
                 this._setPanelBackground(floating);
                 this._setPanelForeground(floating);
                 break;
             case "bg-changed":
+                for (const bg_area of bg_areas) {
+                    bg_area.set_style("");
+                }
                 this._setPanelBackground(floating);
                 this._setPanelForeground(floating);
                 this._setPanelMenuStyle(floating);
@@ -330,24 +352,47 @@ export default class DynamicPanelExtension extends Extension {
         this.ani2 = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
             const _transparent = this._settings.get_int("transparent") / 100;
 
+            let bg_areas = [Main.panel];
+            if (this._settings.get_int('background-mode') === 1) {
+                this._updateStyle(Main.panel, "background-color", `rgba(0, 0, 0, 0)`);
+                bg_areas = [Main.panel._leftBox, Main.panel._centerBox, Main.panel._rightBox];
+                const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+                const panelHeight = Main.panel.get_height() / 2 * (this._settings.get_int("radius-times") / 100) * scale;
+                for (const bg_area of bg_areas) {
+                    this._updateStyle(bg_area, "border-radius", `${panelHeight}px`);
+                }
+            }
+
             if (Main.panel.has_style_pseudo_class("overview")) {
                 Main.panel.remove_style_class_name(this.floatingPanelClass);
-                this._updateStyle(Main.panel, "background-color", `rgba(0, 0, 0, 0)`);
+                for (const bg_area of bg_areas) {
+                    this._updateStyle(bg_area, "background-color", `rgba(0, 0, 0, 0)`);
+                }
             } else if (floating) {
                 Main.panel.add_style_class_name(this.floatingPanelClass);
                 if (this._isDarkMode()) {
-                    this._updateStyle(Main.panel, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
+                    for (const bg_area of bg_areas) {
+                        this._updateStyle(bg_area, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
+                    }
                 } else {
-                    this._updateStyle(Main.panel, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
+                    for (const bg_area of bg_areas) {
+                        this._updateStyle(bg_area, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
+                    }
                 }
             } else if (this._settings.get_boolean("colors-use-in-static")) {
                 Main.panel.remove_style_class_name(this.floatingPanelClass);
+                for (const bg_area of bg_areas) {
+                    bg_area.set_style("");
+                }
                 if (this._isDarkMode()) {
                     this._updateStyle(Main.panel, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, 1)`);
                 } else {
                     this._updateStyle(Main.panel, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, 1)`);
                 }
             } else {
+                for (const bg_area of bg_areas) {
+                    bg_area.set_style("");
+                }
                 Main.panel.remove_style_class_name(this.floatingPanelClass);
                 Main.panel.set_style("");
             }
@@ -378,39 +423,62 @@ export default class DynamicPanelExtension extends Extension {
     // 設定面板選單樣式
     _setPanelMenuStyle(floating) {
         const _transparent = this._settings.get_int("transparent") / 100;
-        if (this._settings.get_boolean("transparent-menus") && floating) {
-            for (const pmenu of Main.uiGroup.get_children()) {
-                if (!!pmenu.has_style_class_name &&
-                    pmenu.has_style_class_name("panel-menu")
-                ) {
-
-                    pmenu.add_style_class_name(this.floatingPanelMenuClass);
-                    if (this._isDarkMode()) {
-                        this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
-                    } else {
-                        this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
+        if (this._settings.get_boolean("transparent-menus")) { // 總開關：是否對面板選單應用樣式
+            if (floating || (this._settings.get_boolean("transparent-menus-keep-alpha") && this._settings.get_boolean("colors-use-in-static"))) { // 浮動 或 保持透明度的同時將顏色應用到實體模式
+                for (const pmenu of Main.uiGroup.get_children()) {
+                    if (!!pmenu.has_style_class_name &&
+                        pmenu.has_style_class_name("panel-menu")
+                    ) {
+                        pmenu.add_style_class_name(this.floatingPanelMenuClass);
+                        if (this._isDarkMode()) {
+                            this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
+                        } else {
+                            this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
+                        }
+                    }
+                }
+            } else if (this._settings.get_boolean("transparent-menus-keep-alpha")) { // 實體模式 未應用自訂顏色 但保持透明度
+                for (const pmenu of Main.uiGroup.get_children()) {
+                    if (!!pmenu.has_style_class_name &&
+                        pmenu.has_style_class_name("panel-menu")
+                    ) {
+                        pmenu.add_style_class_name(this.floatingPanelMenuClass);
+                        if (this._isDarkMode()) {
+                            this._updateStyle(pmenu._delegate.box, "background-color", `rgba(53, 53, 53, ${_transparent})`);
+                        } else {
+                            this._updateStyle(pmenu._delegate.box, "background-color", `rgba(245, 245, 245, ${_transparent})`);
+                        }
+                    }
+                }
+            } else if (this._settings.get_boolean("colors-use-in-static")) { // 實體模式 不保持透明度 但應用自訂顏色
+                for (const pmenu of Main.uiGroup.get_children()) {
+                    if (!!pmenu.has_style_class_name &&
+                        pmenu.has_style_class_name("panel-menu")
+                    ) {
+                        pmenu.add_style_class_name(this.floatingPanelMenuClass);
+                        if (this._isDarkMode()) {
+                            this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, 1)`);
+                        } else {
+                            this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, 1)`);
+                        }
+                    }
+                }
+            } else { // 實體模式 不保持透明度 不應用自訂顏色
+                for (const pmenu of Main.uiGroup.get_children()) {
+                    if (!!pmenu.has_style_class_name &&
+                        pmenu.has_style_class_name("panel-menu")
+                    ) {
+                        pmenu.add_style_class_name(this.floatingPanelMenuClass);
+                        pmenu._delegate.box.set_style("");
                     }
                 }
             }
-        } else if (this._settings.get_boolean("colors-use-in-static")) {
+        } else { // 未應用樣式 清除樣式
             for (const pmenu of Main.uiGroup.get_children()) {
                 if (!!pmenu.has_style_class_name &&
                     pmenu.has_style_class_name("panel-menu")
                 ) {
-                    if (this._isDarkMode()) {
-                        this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, 1)`);
-                        this._updateStyle(pmenu._delegate.box, "color", `rgb(${this.fgcolor[0][0]}, ${this.fgcolor[0][1]}, ${this.fgcolor[0][2]})`);
-                    } else {
-                        this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, 1)`);
-                        this._updateStyle(pmenu._delegate.box, "color", `rgb(${this.fgcolor[1][0]}, ${this.fgcolor[1][1]}, ${this.fgcolor[1][2]})`);
-                    }
-                }
-            }
-        } else {
-            for (const pmenu of Main.uiGroup.get_children()) {
-                if (!!pmenu.has_style_class_name &&
-                    pmenu.has_style_class_name("panel-menu")
-                ) {
+                    pmenu.remove_style_class_name(this.floatingPanelMenuClass);
                     pmenu._delegate.box.set_style("");
                 }
             }
@@ -426,7 +494,8 @@ export default class DynamicPanelExtension extends Extension {
             const align = this._settings.get_int("float-align");
             const topMargin = this._settings.get_int("top-margin");
             const sideMargin = this._settings.get_int("side-margin");
-            const floating_width = screenWidth * (this._settings.get_int("float-width") / 100);
+            const minWidth = Main.panel._leftBox.get_preferred_width(0)[1] + Main.panel._centerBox.get_preferred_width(0)[1] + Main.panel._rightBox.get_preferred_width(0)[1] + 20;
+            const floating_width = (this._settings.get_boolean('auto-width'))?minWidth: Math.max(screenWidth * (this._settings.get_int("float-width") / 100), minWidth);
             let x = 0;
             switch (align) {
                 case 0:
@@ -446,9 +515,17 @@ export default class DynamicPanelExtension extends Extension {
                 duration: duration,
                 mode: Clutter.AnimationMode.EASE_OUT_SINE
             })
-        } else {
+        } else if(this._settings.get_int('solid-type') === 0) {
             Main.layoutManager.panelBox.ease({
                 translation_y: 0,
+                translation_x: 0,
+                width: screenWidth,
+                duration: duration,
+                mode: Clutter.AnimationMode.EASE_OUT_SINE
+            })
+        }else {
+            Main.layoutManager.panelBox.ease({
+                translation_y: -Main.panel.get_height(),
                 translation_x: 0,
                 width: screenWidth,
                 duration: duration,

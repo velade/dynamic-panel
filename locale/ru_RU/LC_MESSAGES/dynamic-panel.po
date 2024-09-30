@@ -15,8 +15,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4.4\n"
 
-msgid "外觀設定"
-msgstr "Настройки внешнего вида"
+msgid "通用設定"
+msgstr "Общие настройки"
+
+msgid "懸浮模式"
+msgstr "Плавающий режим"
+
+msgid "實體模式"
+msgstr "Сплошной режим"
 
 msgid "左側"
 msgstr "Слева"
@@ -30,13 +36,13 @@ msgstr "Справа"
 msgid "不透明度 (%)"
 msgstr "Непрозрачность (%)"
 
-msgid "選單透明"
-msgstr "Прозрачные меню"
+msgid "應用面板樣式到面板選單"
+msgstr "Применить стиль панели к меню панели"
 
 msgid "面板圓角 (%)"
 msgstr "Скругление углов (%)"
 
-msgid "浮動長度 (%)"
+msgid "面板長度 (%)"
 msgstr "Ширина панели (%)"
 
 msgid "頂部邊距 (px)"
@@ -63,11 +69,26 @@ msgstr "Цвет фона"
 msgid "前景色"
 msgstr "Цвет переднего плана"
 
-msgid "應用於實體模式"
-msgstr "Применить к физическому режиму"
-
-msgid "動畫設定"
-msgstr "Настройки анимации"
+msgid "應用自訂顏色"
+msgstr "Применить пользовательские цвета"
 
 msgid "動畫時長 (ms)"
 msgstr "Продолжительность (ms)"
+
+msgid "檢測方式"
+msgstr "Метод обнаружения"
+
+msgid "背景模式"
+msgstr "Фоновый режим"
+
+msgid "自動長度"
+msgstr "Автоматическая длина"
+
+msgid "實體類型"
+msgstr "Тип объекта"
+
+msgid "實體模式保持透明度"
+msgstr "Сохранять прозрачность в сплошном режиме"
+
+msgid "敬請期待"
+msgstr "Ожидайте"

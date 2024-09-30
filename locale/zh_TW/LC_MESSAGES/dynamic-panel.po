@@ -16,8 +16,14 @@ msgstr ""
 "Plura   \n"
 "X-Generator: Gtranslator 46.1\n"
 
-msgid "外觀設定"
-msgstr "外觀設定"
+msgid "通用設定"
+msgstr "通用設定"
+
+msgid "懸浮模式"
+msgstr "懸浮模式"
+
+msgid "實體模式"
+msgstr "實體模式"
 
 msgid "左側"
 msgstr "左側"
@@ -31,14 +37,14 @@ msgstr "右側"
 msgid "不透明度 (%)"
 msgstr "不透明度 (%)"
 
-msgid "選單透明"
-msgstr "選單透明"
+msgid "應用面板樣式到面板選單"
+msgstr "應用面板樣式到面板選單"
 
 msgid "面板圓角 (%)"
 msgstr "面板圓角 (%)"
 
-msgid "浮動長度 (%)"
-msgstr "浮動長度 (%)"
+msgid "面板長度 (%)"
+msgstr "面板長度 (%)"
 
 msgid "頂部邊距 (px)"
 msgstr "頂部邊距 (px)"
@@ -64,11 +70,26 @@ msgstr "背景色"
 msgid "前景色"
 msgstr "前景色"
 
-msgid "應用於實體模式"
-msgstr "應用於實體模式"
-
-msgid "動畫設定"
-msgstr "動畫設定"
+msgid "應用自訂顏色"
+msgstr "應用自訂顏色"
 
 msgid "動畫時長 (ms)"
 msgstr "動畫時長 (ms)"
+
+msgid "檢測方式"
+msgstr "檢測方式"
+
+msgid "背景模式"
+msgstr "背景模式"
+
+msgid "自動長度"
+msgstr "自動長度"
+
+msgid "實體類型"
+msgstr "實體類型"
+
+msgid "實體模式保持透明度"
+msgstr "實體模式保持透明度"
+
+msgid "敬請期待"
+msgstr "敬請期待"

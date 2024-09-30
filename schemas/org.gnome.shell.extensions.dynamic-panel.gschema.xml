@@ -36,6 +36,11 @@
 			<summary>the transparent applie of panel floatting menus</summary>
 			<description/>
 		</key>
+		<key type="b" name="transparent-menus-keep-alpha">
+			<default>false</default>
+			<summary>Force menu transparency to remain</summary>
+			<description/>
+		</key>
 		<key type="i" name="duration">
 			<default>250</default>
 			<summary>The rate of panel transition speed</summary>
@@ -64,6 +69,26 @@
 		<key type="b" name="colors-use-in-static">
 			<default>false</default>
 			<summary>The Colors use in static mode or not </summary>
+			<description/>
+		</key>
+		<key type="i" name="detection-mode">
+			<default>0</default>
+			<summary>How to decide to enter and exit solid mode</summary>
+			<description/>
+		</key>
+		<key type="i" name="background-mode">
+			<default>0</default>
+			<summary>Fill or Area background</summary>
+			<description/>
+		</key>
+		<key type="b" name="auto-width">
+			<default>false</default>
+			<summary>Auto width or not</summary>
+			<description/>
+		</key>
+		<key type="i" name="solid-type">
+			<default>0</default>
+			<summary>Indicates whether solid mode is docked or hidden</summary>
 			<description/>
 		</key>
 	</schema>

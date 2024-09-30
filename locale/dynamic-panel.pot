@@ -17,7 +17,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "外觀設定"
+msgid "通用設定"
+msgstr ""
+
+msgid "懸浮模式"
+msgstr ""
+
+msgid "實體模式"
 msgstr ""
 
 msgid "左側"
@@ -32,13 +38,13 @@ msgstr ""
 msgid "不透明度 (%)"
 msgstr ""
 
-msgid "選單透明"
+msgid "應用面板樣式到面板選單"
 msgstr ""
 
 msgid "面板圓角 (%)"
 msgstr ""
 
-msgid "浮動長度 (%)"
+msgid "面板長度 (%)"
 msgstr ""
 
 msgid "頂部邊距 (px)"
@@ -65,11 +71,26 @@ msgstr ""
 msgid "前景色"
 msgstr ""
 
-msgid "應用於實體模式"
-msgstr ""
-
-msgid "動畫設定"
+msgid "應用自訂顏色"
 msgstr ""
 
 msgid "動畫時長 (ms)"
+msgstr ""
+
+msgid "檢測方式"
+msgstr ""
+
+msgid "背景模式"
+msgstr ""
+
+msgid "自動長度"
+msgstr ""
+
+msgid "實體類型"
+msgstr ""
+
+msgid "實體模式保持透明度"
+msgstr ""
+
+msgid "敬請期待"
 msgstr ""
