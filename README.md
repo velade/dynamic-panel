@@ -2,11 +2,18 @@
 
 # 動態頂部面板
 
-靈感來源於 KDE Plasma 6 的懸浮面板的設計，在附近沒有視窗時呈現半透明懸浮條效果，而當視窗靠近時則呈現實色面板的樣式。支援 Gnome 的暗色模式和亮色模式切換。可針對暗色和亮色模式分別設定自訂顏色。
+最初靈感來源於 KDE Plasma 6 的懸浮面板的設計，在附近沒有視窗時呈現半透明懸浮條效果，而當視窗靠近時則呈現實色面板的樣式。支援 Gnome 的暗色模式和亮色模式切換。可針對暗色和亮色模式分別設定自訂顏色。還有更多設定！
 
 ## 懸浮模式
 ![懸浮模式](readme_images/transparent.png)
-當頂部面板附近沒有視窗時，會呈現懸浮模式，懸浮模式僅僅有半透明效果，沒有模糊效果，目前如果想要模糊效果，建議搭配 Blur my shell 對於面板的靜態 pipeline 使用。Blur my shell 動態模式會沒有圓角，這是 Blur my shell 的問題。
+![懸浮模式](readme_images/transparent_area.png)
+![懸浮模式](readme_images/transparent_auto_width.png)
+![懸浮模式](readme_images/transparent_color.png)
+當頂部面板附近沒有視窗時，會呈現懸浮模式。
+
+**你可以任意組合各種樣式，但不恰當的組合可能不會帶來好的視覺效果。**
+
+懸浮模式僅僅有半透明效果，沒有模糊效果，目前如果想要模糊效果，建議搭配 Blur my shell 對於面板的靜態 pipeline 使用。Blur my shell 動態模式會沒有圓角，這是 Blur my shell 的問題。
 ### Blur my shell 設定
 ![Blur my shell 設定](readme_images/bms_settings1.png)
 
@@ -18,7 +25,7 @@
 ### 搭配 Blur my shell 使用的效果
 ![帶模糊的懸浮效果](readme_images/blur.png)
 
-## 停靠模式/實體模式
+## 實體模式
 ![實體模式](readme_images/solid.png)
 當有任何視窗足夠靠近（幾乎接觸）頂部面板時，頂部面板將會變為不透明的停靠欄（和 Gnome 默認的一樣，但你可以對其應用自訂顏色），與最大化視窗可以更好的融合，而不像主題一樣始終懸浮會有「漏光」的現象。
 
