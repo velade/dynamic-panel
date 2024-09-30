@@ -74,7 +74,7 @@ export default class extends ExtensionPreferences {
             settings.set_boolean('transparent-menus-keep-alpha', state);
         })
         sTransMenuKeepAlpha.set_active(settings.get_boolean('transparent-menus-keep-alpha'));
-        let rowTransMenuKeepAlpha = new Adw.ActionRow({ title: _('    實體模式保持透明度') });
+        let rowTransMenuKeepAlpha = new Adw.ActionRow({ title: "    " + _('實體模式保持透明度') });
         rowTransMenuKeepAlpha.add_suffix(sTransMenuKeepAlpha);
         gCommon.add(rowTransMenuKeepAlpha);
 
