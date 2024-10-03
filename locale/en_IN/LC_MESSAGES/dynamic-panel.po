@@ -1,0 +1,116 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Ritam Saha <ritamsaha00@gmail.com>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Dynamic Panel 4.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-07 15:14+0800\n"
+"PO-Revision-Date: 2024-10-03 13:01+0530\n"
+"Last-Translator: Ritam Saha <ritamsaha00@gmail.com>\n"
+"Language-Team: Bengali (India)\n"
+"Language: bn_IN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Gtranslator 46.1\n"
+
+msgid "通用設定"
+msgstr "General"
+
+msgid "懸浮模式"
+msgstr "Floating Mode"
+
+msgid "實體模式"
+msgstr "Solid Mode"
+
+msgid "左側"
+msgstr "Left"
+
+msgid "居中"
+msgstr "Center"
+
+msgid "右側"
+msgstr "Right"
+
+msgid "不透明度 (%)"
+msgstr "Opacity (%)"
+
+msgid "應用面板樣式到面板選單"
+msgstr "Apply panel style to panel menu"
+
+msgid "面板圓角 (%)"
+msgstr "Border Radius (%)"
+
+msgid "面板長度 (%)"
+msgstr "Panel Width (%)"
+
+msgid "頂部邊距 (px)"
+msgstr "Top Margin (px)"
+
+msgid "側面邊距 (px)"
+msgstr "Side Margin (px)"
+
+msgid "對齊方式"
+msgstr "Align"
+
+msgid "自訂顏色"
+msgstr "Custom Colours"
+
+msgid "暗黑模式"
+msgstr "Dark Mode"
+
+msgid "明亮模式"
+msgstr "Light Mode"
+
+msgid "背景色"
+msgstr "Background Colour"
+
+msgid "前景色"
+msgstr "Foreground Colours"
+
+msgid "應用自訂顏色"
+msgstr "Apply Custom Colours"
+
+msgid "動畫時長 (ms)"
+msgstr "Duration (ms)"
+
+msgid "檢測方式"
+msgstr "Detection Method"
+
+msgid "背景模式"
+msgstr "Background Mode"
+
+msgid "自動長度"
+msgstr "Auto Width"
+
+msgid "實體類型"
+msgstr "Solid Mode Type"
+
+msgid "實體模式保持透明度"
+msgstr "Constant Entity Mode Transparency"
+
+msgid "敬請期待"
+msgstr "Coming Soon"
+
+msgid "靠近"
+msgstr "Window Close"
+
+msgid "僅最大化"
+msgstr "Maximize Only"
+
+msgid "整體"
+msgstr "Continuous"
+
+msgid "區域"
+msgstr "Separated"
+
+msgid "停靠"
+msgstr "Dock"
+
+msgid "隱藏"
+msgstr "Hide"
