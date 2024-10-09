@@ -53,6 +53,7 @@
 # 翻译贡献者（排名不分先后）
 * [Aleksandr Shamaraev](https://github.com/AlexanderShad) - 俄语 (Russian)
 * [Amerey](https://github.com/Amereyeu) - 捷克语 (Czech)
+* [Ritam Saha](https://github.com/astro-ray) - 英文(印度)
 
 # 特别鸣谢（排名不分先后）
 * **感谢 Gonzague/Paul Fauchon 的 Transparent Top Bar (Adjustable transparency) 的思路，对窗口靠近的判定实现思路大量参考了此扩展功能**

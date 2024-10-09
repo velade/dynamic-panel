@@ -4,6 +4,7 @@ import GLib from "gi://GLib";
 import Gio from "gi://Gio";
 import Clutter from "gi://Clutter";
 
+import * as PointerWatcher from 'resource:///org/gnome/shell/ui/pointerWatcher.js';
 import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
 import * as Main from "resource:///org/gnome/shell/ui/main.js";
 
@@ -20,6 +21,8 @@ export default class DynamicPanelExtension extends Extension {
         this.ani = null;
         this.ani2 = null;
         this._panelButtons = [];
+        this._panelHiddenConnect = null;
+        this._squeezeCount = null;
     }
 
     enable() {
@@ -30,6 +33,8 @@ export default class DynamicPanelExtension extends Extension {
         this._animations = new Map();
 
         this._panelButtons = [];
+        this._panelHiddenConnect = null;
+        this._squeezeCount = 0;
 
         // 讀取設定並開始監控變化
         this._settings = this.getSettings();
@@ -43,6 +48,7 @@ export default class DynamicPanelExtension extends Extension {
             this._settings.connect("changed::top-margin", () => { this._updatePanelSingleStyle("allocation-changed") }),
             this._settings.connect("changed::side-margin", () => { this._updatePanelSingleStyle("allocation-changed") }),
             this._settings.connect("changed::auto-width", () => { this._updatePanelSingleStyle("allocation-changed") }),
+            this._settings.connect("changed::solid-type", () => { this._updatePanelSingleStyle("allocation-changed") }),
             this._settings.connect("changed::dark-bg-color", () => { this._updatePanelSingleStyle("color-changed") }),
             this._settings.connect("changed::dark-fg-color", () => { this._updatePanelSingleStyle("color-changed") }),
             this._settings.connect("changed::light-bg-color", () => { this._updatePanelSingleStyle("color-changed") }),
@@ -112,6 +118,9 @@ export default class DynamicPanelExtension extends Extension {
         // 設定為false，恢復到默認樣式，帶動畫用以優雅退場。（此時所有附加內容就應該已經被清除了）
         this._updatePanelStyle(true, false);
 
+        // 清除自動隱藏功能產生的影響
+        this._clearPeekEffect();
+
         // 二次清理確保附加的內容被清除
 
         // -- 清除動畫計時器
@@ -128,6 +137,8 @@ export default class DynamicPanelExtension extends Extension {
         this.fgcolor = null;
         this.ani = null;
         this.ani2 = null;
+        this._panelHiddenConnect = null;
+        this._squeezeCount = null;
 
         // -- 清除面板樣式
         Main.panel.remove_style_class_name(this.floatingPanelClass);
@@ -278,6 +289,16 @@ export default class DynamicPanelExtension extends Extension {
         }
     }
 
+    // 清除自動隱藏相關影響
+    _clearPeekEffect() {
+        PointerWatcher.getPointerWatcher()._removeWatch(this._panelHiddenConnect);
+        this._panelHiddenConnect = null;
+        Main.panel.remove_style_class_name("peeking");
+        Main.panel._leftBox.visible = true;
+        Main.panel._centerBox.visible = true;
+        Main.panel._rightBox.visible = true;
+    }
+
     // 更新單獨樣式
     _updatePanelSingleStyle(propname) {
         const floating = this._isFloating();
@@ -332,6 +353,7 @@ export default class DynamicPanelExtension extends Extension {
             (floating && !Main.panel.has_style_class_name(this.floatingPanelClass)) || // 應該懸浮但未懸浮
             (!floating && Main.panel.has_style_class_name(this.floatingPanelClass))// 不應該懸浮但懸浮
         ) {
+            this._clearPeekEffect();
             this._setPanelBackground(floating);
             this._setPanelForeground(floating);
             this._setPanelMenuStyle(floating);
@@ -339,6 +361,9 @@ export default class DynamicPanelExtension extends Extension {
             this._setPanelRadius(floating);
         } else if (forceUpdate) {
             if (forceFloating === null) forceFloating = floating;
+
+            this._clearPeekEffect();
+
             this._setPanelBackground(forceFloating);
             this._setPanelForeground(forceFloating);
             this._setPanelMenuStyle(forceFloating);
@@ -370,6 +395,17 @@ export default class DynamicPanelExtension extends Extension {
                 }
             } else if (floating) {
                 Main.panel.add_style_class_name(this.floatingPanelClass);
+                if (this._isDarkMode()) {
+                    for (const bg_area of bg_areas) {
+                        this._updateStyle(bg_area, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
+                    }
+                } else {
+                    for (const bg_area of bg_areas) {
+                        this._updateStyle(bg_area, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
+                    }
+                }
+            } else if (this._settings.get_int("solid-type") == 1) {
+                Main.panel.remove_style_class_name(this.floatingPanelClass);
                 if (this._isDarkMode()) {
                     for (const bg_area of bg_areas) {
                         this._updateStyle(bg_area, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
@@ -424,7 +460,7 @@ export default class DynamicPanelExtension extends Extension {
     _setPanelMenuStyle(floating) {
         const _transparent = this._settings.get_int("transparent") / 100;
         if (this._settings.get_boolean("transparent-menus")) { // 總開關：是否對面板選單應用樣式
-            if (floating || (this._settings.get_boolean("transparent-menus-keep-alpha") && this._settings.get_boolean("colors-use-in-static"))) { // 浮動 或 保持透明度的同時將顏色應用到實體模式
+            if (floating || (this._settings.get_boolean("transparent-menus-keep-alpha") && this._settings.get_boolean("colors-use-in-static")) || this._settings.get_int("solid-type") == 1) { // 浮動 或 保持透明度的同時將顏色應用到實體模式 或 實體模式為自動隱藏
                 for (const pmenu of Main.uiGroup.get_children()) {
                     if (!!pmenu.has_style_class_name &&
                         pmenu.has_style_class_name("panel-menu")
@@ -491,11 +527,13 @@ export default class DynamicPanelExtension extends Extension {
         const duration = this._settings.get_int("duration");
         const screenWidth = Main.layoutManager.primaryMonitor.width;
         if (floating) {
+            this._clearPeekEffect();
+
             const align = this._settings.get_int("float-align");
             const topMargin = this._settings.get_int("top-margin");
             const sideMargin = this._settings.get_int("side-margin");
             const minWidth = Main.panel._leftBox.get_preferred_width(0)[1] + Main.panel._centerBox.get_preferred_width(0)[1] + Main.panel._rightBox.get_preferred_width(0)[1] + 20;
-            const floating_width = (this._settings.get_boolean('auto-width'))?minWidth: Math.max(screenWidth * (this._settings.get_int("float-width") / 100), minWidth);
+            const floating_width = (this._settings.get_boolean('auto-width')) ? minWidth : Math.max(screenWidth * (this._settings.get_int("float-width") / 100), minWidth);
             let x = 0;
             switch (align) {
                 case 0:
@@ -515,7 +553,9 @@ export default class DynamicPanelExtension extends Extension {
                 duration: duration,
                 mode: Clutter.AnimationMode.EASE_OUT_SINE
             })
-        } else if(this._settings.get_int('solid-type') === 0) {
+        } else if (this._settings.get_int('solid-type') === 0) {
+            this._clearPeekEffect();
+
             Main.layoutManager.panelBox.ease({
                 translation_y: 0,
                 translation_x: 0,
@@ -523,14 +563,57 @@ export default class DynamicPanelExtension extends Extension {
                 duration: duration,
                 mode: Clutter.AnimationMode.EASE_OUT_SINE
             })
-        }else {
-            Main.layoutManager.panelBox.ease({
-                translation_y: -Main.panel.get_height(),
-                translation_x: 0,
-                width: screenWidth,
-                duration: duration,
-                mode: Clutter.AnimationMode.EASE_OUT_SINE
-            })
+        } else {
+            if (!this._panelHiddenConnect) {
+                Main.layoutManager.panelBox.ease({
+                    translation_y: -Main.panel.get_height(),
+                    translation_x: screenWidth * 0.01 / 2,
+                    width: screenWidth * 0.99,
+                    duration: duration,
+                    mode: Clutter.AnimationMode.EASE_OUT_SINE
+                })
+                this._panelHiddenConnect = PointerWatcher.getPointerWatcher().addWatch(100, (x, y) => {
+                    if (y > Main.panel.get_height() + 1 && Main.panel.has_style_class_name("peeking")) {
+                        Main.panel.remove_style_class_name("peeking");
+                        Main.layoutManager.panelBox.ease({
+                            translation_y: -Main.panel.get_height(),
+                            duration: duration,
+                            mode: Clutter.AnimationMode.EASE_IN_SINE
+                        })
+                        this._squeezeCount = 0;
+                    } else if (y == 0 && this._squeezeCount <= 2) {
+                        this._squeezeCount++;
+                    } else if (this._squeezeCount > 2 && !Main.panel.has_style_class_name("peeking")) {
+                        if (this._settings.get_int("background-mode") == 1) {
+                            if (x < screenWidth * 0.33) {
+                                Main.panel._leftBox.visible = true;
+                                Main.panel._centerBox.visible = false;
+                                Main.panel._rightBox.visible = false;
+                            } else if (x < screenWidth * 0.66) {
+                                Main.panel._leftBox.visible = false;
+                                Main.panel._centerBox.visible = true;
+                                Main.panel._rightBox.visible = false;
+                            } else {
+                                Main.panel._leftBox.visible = false;
+                                Main.panel._centerBox.visible = false;
+                                Main.panel._rightBox.visible = true;
+                            }
+                        } else {
+                            Main.panel._leftBox.visible = true;
+                            Main.panel._centerBox.visible = true;
+                            Main.panel._rightBox.visible = true;
+                        }
+                        Main.panel.add_style_class_name("peeking");
+                        Main.layoutManager.panelBox.ease({
+                            translation_y: 1,
+                            duration: duration,
+                            mode: Clutter.AnimationMode.EASE_OUT_SINE
+                        })
+                        this._setPanelBackground();
+                        this._setPanelRadius();
+                    }
+                })
+            }
         }
     }
 
@@ -548,7 +631,7 @@ export default class DynamicPanelExtension extends Extension {
             let elapsedTime = currentTime - startTime;
             progress = Math.min(elapsedTime / duration, 1);
             let currentValue;
-            if (floating) {
+            if (floating || this._settings.get_int("solid-type") == 1) {
                 currentValue = progress;
             } else {
                 currentValue = 1 - progress;
