@@ -11,6 +11,8 @@ Special Thanks (in no particular order)
 Thanks to Gonzague/Paul Fauchon's Transparent Top Bar (Adjustable transparency) for the idea, the implementation of window proximity detection largely refers to this extension
 Thanks to Google Gemini for the help provided in the research and learning of Gjs
 
+👇  See what's new!  Update logs are available on GitHub Releases 👇
+
 動態頂部面板
 最初靈感來源於 KDE Plasma 6 的懸浮面板的設計，在附近沒有視窗時呈現半透明懸浮條效果，而當視窗靠近時則呈現實色面板的樣式。支援 Gnome 的暗色模式和亮色模式切換。可針對暗色和亮色模式分別設定自訂顏色。還有更多設定！
 
@@ -23,3 +25,5 @@ Thanks to Google Gemini for the help provided in the research and learning of Gj
 特別鳴謝（排名不分先後）
 感謝 Gonzague/Paul Fauchon 的 Transparent Top Bar (Adjustable transparency) 的思路，對視窗靠近的判定實現思路大量參考了此擴充功能
 感謝 Google Gemini 在研究和學習 Gjs 過程中提供的幫助
+
+👇更新日誌請到GitHub的Releases查看👇
