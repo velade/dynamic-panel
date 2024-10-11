@@ -7,7 +7,7 @@ current_version=$(cat metadata.json | sed 's/,/\n/g' | grep "version-name" | sed
 zip_file="dynamic-panel@velhlkj.com_v${current_version}.zip"
 
 # 指定要排除的文件和目录，多个文件/目录以空格分隔
-exclude_files="*.md *.txt *.po *.pot locale/compile_all.sh pack.sh"
+exclude_files="*.md *.txt *.po *.pot *.zip locale/compile_all.sh pack.sh"
 
 # 打包当前目录，排除指定文件
 zip -r "$zip_file" . -x "./readme_images/*" "./.git/*" $exclude_files
