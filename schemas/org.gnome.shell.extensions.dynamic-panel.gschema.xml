@@ -46,6 +46,11 @@
 			<summary>Duration of the animation, may not have an effect on the panel background gradient.</summary>
 			<description/>
 		</key>
+		<key type="b" name="auto-background">
+			<default>false</default>
+			<summary>Automatic background color: On/Off</summary>
+			<description/>
+		</key>
 		<key type="s" name="dark-bg-color">
 			<default>'rgb(0, 0, 0)'</default>
 			<summary>Custom dark mode background color</summary>

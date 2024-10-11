@@ -113,3 +113,9 @@ msgstr "Ukotvit"
 
 msgid "隱藏"
 msgstr "Skrýt"
+
+msgid "多彩"
+msgstr "Barevný"
+
+msgid "自動從桌布取得顏色"
+msgstr "Automaticky získat barvu z tapety"

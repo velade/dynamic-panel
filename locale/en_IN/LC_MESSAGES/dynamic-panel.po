@@ -114,3 +114,9 @@ msgstr "Dock"
 
 msgid "隱藏"
 msgstr "Hide"
+
+msgid "多彩"
+msgstr "Multicoloured" 
+
+msgid "自動從桌布取得顏色"
+msgstr "Automatically get colour from wallpaper" 

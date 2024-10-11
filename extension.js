@@ -3,6 +3,7 @@ import St from "gi://St";
 import GLib from "gi://GLib";
 import Gio from "gi://Gio";
 import Clutter from "gi://Clutter";
+import Colors from "./colors.js";
 
 import * as PointerWatcher from 'resource:///org/gnome/shell/ui/pointerWatcher.js';
 import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
@@ -53,6 +54,7 @@ export default class DynamicPanelExtension extends Extension {
             this._settings.connect("changed::dark-fg-color", () => { this._updatePanelSingleStyle("color-changed") }),
             this._settings.connect("changed::light-bg-color", () => { this._updatePanelSingleStyle("color-changed") }),
             this._settings.connect("changed::light-fg-color", () => { this._updatePanelSingleStyle("color-changed") }),
+            this._settings.connect("changed::auto-background", () => { this._updatePanelSingleStyle("color-changed") }),
             this._settings.connect("changed::colors-use-in-static", () => { this._updatePanelSingleStyle("bg-changed") }),
             this._settings.connect("changed::background-mode", () => { this._updatePanelSingleStyle("bg-changed") })
         ])
@@ -80,9 +82,13 @@ export default class DynamicPanelExtension extends Extension {
         ]);
 
         // 監控系統暗黑模式變化
-        let settings = new Gio.Settings({ schema: "org.gnome.desktop.interface" });
+        const settings = new Gio.Settings({ schema: "org.gnome.desktop.interface" });
         this._actorSignalIds.set(settings, [
-            settings.connect("changed::color-scheme", () => { this._updatePanelSingleStyle("bg-changed") })
+            settings.connect("changed::color-scheme", () => { this._updatePanelSingleStyle("color-changed") })
+        ])
+        const bgsettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.background' });
+        this._actorSignalIds.set(bgsettings, [
+            bgsettings.connect('changed::picture-uri', () => { this._updatePanelSingleStyle("color-changed") })
         ])
 
         // 監控Panel內容變化
@@ -199,16 +205,15 @@ export default class DynamicPanelExtension extends Extension {
 
     // 更新顏色設定
     _updateColorSettings() {
-        let D_BGC = this._settings.get_string('dark-bg-color');
-        let D_FGC = this._settings.get_string('dark-fg-color');
-        let L_BGC = this._settings.get_string('light-bg-color');
-        let L_FGC = this._settings.get_string('light-fg-color');
-        D_BGC = D_BGC.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
-        D_FGC = D_FGC.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
-        L_BGC = L_BGC.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
-        L_FGC = L_FGC.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
-        this.bgcolor = [[D_BGC[1], D_BGC[2], D_BGC[3]], [L_BGC[1], L_BGC[2], L_BGC[3]]];
-        this.fgcolor = [[D_FGC[1], D_FGC[2], D_FGC[3]], [L_FGC[1], L_FGC[2], L_FGC[3]]];
+        [this.bgcolor, this.fgcolor] = Colors.getCustomColor(this._settings);
+        if(this._settings.get_boolean("auto-background")) {
+            const wallpaperSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.background' });
+            const wallpaperUri = wallpaperSettings.get_string('picture-uri');
+            const imagePath = wallpaperUri.replace(/^file:\/\//, "");
+            const modifier = this._isDarkMode() ? "dark" : "light";
+            const autoBGC = Colors.getThemeColor(imagePath, modifier);
+            this.bgcolor = [autoBGC, autoBGC];
+        }
     }
 
     // 是否為暗黑模式

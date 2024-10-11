@@ -79,6 +79,21 @@ export default class extends ExtensionPreferences {
         gCommon.add(rowTransMenuKeepAlpha);
 
         // 自訂顏色
+        // 自動獲取顏色開關
+        let sAutoBG = new Gtk.Switch({
+            valign: Gtk.Align.CENTER,
+        });
+        sAutoBG.connect('state-set', (sw, state) => {
+            if (state == settings.get_boolean('auto-background')) return;
+            settings.set_boolean('auto-background', state);
+            if (state) {
+                rowDBGColor.visible = false;
+                rowLBGColor.visible = false;
+            } else {
+                rowDBGColor.visible = true;
+                rowLBGColor.visible = true;
+            }
+        })
         // -- 暗黑模式顏色設定
         let cDBGColor = new Gtk.ColorButton();
         cDBGColor.set_use_alpha(false);
@@ -123,6 +138,8 @@ export default class extends ExtensionPreferences {
         cLFGColor.set_rgba(rgba);
 
         let rowColors = new Adw.ExpanderRow({ title: _('自訂顏色') });
+        let rowAutoBG = new Adw.ActionRow({ title: _("多彩"), subtitle: _("自動從桌布取得顏色") });
+        rowAutoBG.add_suffix(sAutoBG);
         let rowDColors = new Adw.ExpanderRow({ title: _('暗黑模式') });
         let rowDBGColor = new Adw.ActionRow({ title: _('背景色') });
         rowDBGColor.add_suffix(cDBGColor);
@@ -137,6 +154,7 @@ export default class extends ExtensionPreferences {
         rowLFGColor.add_suffix(cLFGColor);
         rowLColors.add_row(rowLBGColor);
         rowLColors.add_row(rowLFGColor);
+        rowColors.add_row(rowAutoBG);
         rowColors.add_row(rowDColors);
         rowColors.add_row(rowLColors);
         gCommon.add(rowColors)

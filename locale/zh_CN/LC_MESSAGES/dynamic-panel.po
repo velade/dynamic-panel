@@ -20,19 +20,19 @@ msgid "通用設定"
 msgstr "通用设置"
 
 msgid "懸浮模式"
-msgstr "浮动模式"
+msgstr "悬浮模式"
 
 msgid "實體模式"
 msgstr "实体模式"
 
 msgid "左側"
-msgstr "靠左"
+msgstr "左侧"
 
 msgid "居中"
 msgstr "居中"
 
 msgid "右側"
-msgstr "靠右"
+msgstr "右侧"
 
 msgid "不透明度 (%)"
 msgstr "不透明度 (%)"
@@ -56,22 +56,22 @@ msgid "對齊方式"
 msgstr "对齐方式"
 
 msgid "自訂顏色"
-msgstr "自定颜色"
+msgstr "自定义颜色"
 
 msgid "暗黑模式"
-msgstr "暗黑模式"
+msgstr "暗色模式" 
 
 msgid "明亮模式"
 msgstr "明亮模式"
 
 msgid "背景色"
-msgstr "背景色"
+msgstr "背景颜色"
 
 msgid "前景色"
 msgstr "前景色"
 
 msgid "應用自訂顏色"
-msgstr "应用自定颜色"
+msgstr "应用自定义颜色"
 
 msgid "動畫時長 (ms)"
 msgstr "动画时长 (ms)"
@@ -111,3 +111,9 @@ msgstr "停靠"
 
 msgid "隱藏"
 msgstr "隐藏"
+
+msgid "多彩"
+msgstr "多彩"
+
+msgid "自動從桌布取得顏色"
+msgstr "自动从壁纸获取颜色"

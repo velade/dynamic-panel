@@ -17,7 +17,7 @@ msgstr ""
 "X-Generator: Gtranslator 46.1\n"
 
 msgid "通用設定"
-msgstr "通用設定"
+msgstr "一般設定"
 
 msgid "懸浮模式"
 msgstr "懸浮模式"
@@ -29,7 +29,7 @@ msgid "左側"
 msgstr "左側"
 
 msgid "居中"
-msgstr "居中"
+msgstr "置中"
 
 msgid "右側"
 msgstr "右側"
@@ -38,7 +38,7 @@ msgid "不透明度 (%)"
 msgstr "不透明度 (%)"
 
 msgid "應用面板樣式到面板選單"
-msgstr "應用面板樣式到面板選單"
+msgstr "套用面板樣式到面板選單"
 
 msgid "面板圓角 (%)"
 msgstr "面板圓角 (%)"
@@ -47,10 +47,10 @@ msgid "面板長度 (%)"
 msgstr "面板長度 (%)"
 
 msgid "頂部邊距 (px)"
-msgstr "頂部邊距 (px)"
+msgstr "上方邊距 (px)" 
 
 msgid "側面邊距 (px)"
-msgstr "側面邊距 (px)"
+msgstr "側邊邊距 (px)"
 
 msgid "對齊方式"
 msgstr "對齊方式"
@@ -59,25 +59,25 @@ msgid "自訂顏色"
 msgstr "自訂顏色"
 
 msgid "暗黑模式"
-msgstr "暗黑模式"
+msgstr "深色模式"
 
 msgid "明亮模式"
 msgstr "明亮模式"
 
 msgid "背景色"
-msgstr "背景色"
+msgstr "背景顏色"
 
 msgid "前景色"
-msgstr "前景色"
+msgstr "前景顏色"
 
 msgid "應用自訂顏色"
-msgstr "應用自訂顏色"
+msgstr "套用自訂顏色"
 
 msgid "動畫時長 (ms)"
-msgstr "動畫時長 (ms)"
+msgstr "動畫長度 (ms)"
 
 msgid "檢測方式"
-msgstr "檢測方式"
+msgstr "偵測方式"
 
 msgid "背景模式"
 msgstr "背景模式"
@@ -89,7 +89,7 @@ msgid "實體類型"
 msgstr "實體類型"
 
 msgid "實體模式保持透明度"
-msgstr "實體模式保持透明度"
+msgstr "實體模式維持透明度"
 
 msgid "敬請期待"
 msgstr "敬請期待"
@@ -98,7 +98,7 @@ msgid "靠近"
 msgstr "視窗靠近"
 
 msgid "僅最大化"
-msgstr "僅最大化"
+msgstr "僅限最大化" 
 
 msgid "整體"
 msgstr "整體"
@@ -111,3 +111,9 @@ msgstr "停靠"
 
 msgid "隱藏"
 msgstr "隱藏"
+
+msgid "多彩"
+msgstr "多色"
+
+msgid "自動從桌布取得顏色"
+msgstr "自動從桌面取得顏色" 

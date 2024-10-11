@@ -6,114 +6,114 @@ msgstr ""
 "Project-Id-Version: Dynamic Panel 2.4\n"
 "Report-Msgid-Bugs-To: support@velhlkj.com\n"
 "POT-Creation-Date: 2023-09-07 00:03-0700\n"
-"PO-Revision-Date: 2024-09-07 15:09+0800\n"
+"PO-Revision-Date: 2024-10-11 14:47+0800\n"
 "Last-Translator: Velade <velade48@gmail.com>\n"
 "Language-Team: VELHLKJ <translate@velhlkj.com>\n"
-"Language: en_US\n"
+"Language: zh_Hant\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plura   \n"
-"X-Generator: Gtranslator 46.1\n"
+"X-Generator: Gtranslator 47.0\n"
 
 msgid "通用設定"
-msgstr "General"
+msgstr "一般設定" 
 
 msgid "懸浮模式"
-msgstr "Floating Mode"
+msgstr "懸浮模式" 
 
 msgid "實體模式"
-msgstr "Solid Mode"
+msgstr "實體模式" 
 
 msgid "左側"
-msgstr "Left"
+msgstr "左側" 
 
 msgid "居中"
-msgstr "Center"
+msgstr "置中" 
 
 msgid "右側"
-msgstr "Right"
+msgstr "右側" 
 
 msgid "不透明度 (%)"
-msgstr "Opacity (%)"
+msgstr "不透明度 (%)" 
 
 msgid "應用面板樣式到面板選單"
-msgstr "Apply panel style to panel menu"
+msgstr "套用面板樣式至面板選單" 
 
 msgid "面板圓角 (%)"
-msgstr "Border Radius (%)"
+msgstr "面板圓角 (%)" 
 
 msgid "面板長度 (%)"
-msgstr "Panel Width (%)"
+msgstr "面板長度 (%)" 
 
 msgid "頂部邊距 (px)"
-msgstr "Top Margin (px)"
+msgstr "頂部邊距 (px)" 
 
 msgid "側面邊距 (px)"
-msgstr "Side Margin (px)"
+msgstr "側邊邊距 (px)" 
 
 msgid "對齊方式"
-msgstr "Align"
+msgstr "對齊方式" 
 
 msgid "自訂顏色"
-msgstr "Custom Colors"
+msgstr "自訂顏色" 
 
 msgid "暗黑模式"
-msgstr "Dark Mode"
+msgstr "深色模式" 
 
 msgid "明亮模式"
-msgstr "Light Mode"
+msgstr "明亮模式" 
 
 msgid "背景色"
-msgstr "Background Color"
+msgstr "背景顏色" 
 
 msgid "前景色"
-msgstr "Foreground Color"
+msgstr "前景顏色" 
 
 msgid "應用自訂顏色"
-msgstr "Apply Custom Colors"
+msgstr "套用自訂顏色" 
 
 msgid "動畫時長 (ms)"
-msgstr "Duration (ms)"
+msgstr "動畫長度 (ms)" 
 
 msgid "檢測方式"
-msgstr "Detection Method"
+msgstr "偵測方式" 
 
 msgid "背景模式"
-msgstr "Background Mode"
+msgstr "背景模式" 
 
 msgid "自動長度"
-msgstr "Auto Width"
+msgstr "自動長度" 
 
 msgid "實體類型"
-msgstr "Solid Mode Type"
+msgstr "實體類型" 
 
 msgid "實體模式保持透明度"
-msgstr "Entity Mode Keep Transparency"
+msgstr "實體模式維持透明度" 
 
 msgid "敬請期待"
-msgstr "Coming Soon"
+msgstr "敬請期待" 
 
 msgid "靠近"
-msgstr "Window Close"
+msgstr "視窗靠近" 
 
 msgid "僅最大化"
-msgstr "Maximize Only"
+msgstr "僅最大化" 
 
 msgid "整體"
-msgstr "Overall"
+msgstr "整體" 
 
 msgid "區域"
-msgstr "Area"
+msgstr "區域" 
 
 msgid "停靠"
-msgstr "Dock"
+msgstr "停靠" 
 
 msgid "隱藏"
-msgstr "Hide"
+msgstr "隱藏" 
 
 msgid "多彩"
-msgstr "Multicolored"
+msgstr "多色" 
 
 msgid "自動從桌布取得顏色"
-msgstr "Automatically get color from wallpaper"
+msgstr "自動從桌布取得顏色" 
