@@ -19,8 +19,9 @@ export default class DynamicPanelExtension extends Extension {
         this._delayedTimeoutId = null;
         this.bgcolor = [];
         this.fgcolor = [];
-        this.ani = null;
-        this.ani2 = null;
+        this._ani = null;
+        this._ani2 = null;
+        this._updateBgDelay = null;
         this._panelButtons = [];
         this._panelHiddenConnect = null;
         this._squeezeCount = null;
@@ -56,7 +57,8 @@ export default class DynamicPanelExtension extends Extension {
             this._settings.connect("changed::light-fg-color", () => { this._updatePanelSingleStyle("color-changed") }),
             this._settings.connect("changed::auto-background", () => { this._updatePanelSingleStyle("color-changed") }),
             this._settings.connect("changed::colors-use-in-static", () => { this._updatePanelSingleStyle("bg-changed") }),
-            this._settings.connect("changed::background-mode", () => { this._updatePanelSingleStyle("bg-changed") })
+            this._settings.connect("changed::background-mode", () => { this._updatePanelSingleStyle("bg-changed") }),
+            this._settings.connect("changed::blur", () => { this._updatePanelSingleStyle("wallpaper-changed") })
         ])
 
         // 監控總覽界面顯示狀態
@@ -88,7 +90,7 @@ export default class DynamicPanelExtension extends Extension {
         ])
         const bgsettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.background' });
         this._actorSignalIds.set(bgsettings, [
-            bgsettings.connect('changed::picture-uri', () => { this._updatePanelSingleStyle("color-changed") })
+            bgsettings.connect('changed::picture-uri', () => { this._updatePanelSingleStyle("wallpaper-changed") })
         ])
 
         // 監控Panel內容變化
@@ -103,6 +105,9 @@ export default class DynamicPanelExtension extends Extension {
 
         // 更新顏色設定
         this._updateColorSettings();
+
+        // 更新模糊背景
+        this._updateBlurredBG();
 
         // 更新panelButtons
         this._updatePanelButtons();
@@ -133,6 +138,7 @@ export default class DynamicPanelExtension extends Extension {
         GLib.Source.remove(this._delayedTimeoutId);
         GLib.Source.remove(this._ani);
         GLib.Source.remove(this._ani2);
+        GLib.Source.remove(this._updateBgDelay);
 
         // -- 清除基本變量
         this._actorSignalIds = null;
@@ -141,8 +147,9 @@ export default class DynamicPanelExtension extends Extension {
         this._settings = null;
         this.bgcolor = null;
         this.fgcolor = null;
-        this.ani = null;
-        this.ani2 = null;
+        this._ani = null;
+        this._ani2 = null;
+        this._updateBgDelay = null;
         this._panelHiddenConnect = null;
         this._squeezeCount = null;
 
@@ -206,13 +213,36 @@ export default class DynamicPanelExtension extends Extension {
     // 更新顏色設定
     _updateColorSettings() {
         [this.bgcolor, this.fgcolor] = Colors.getCustomColor(this._settings);
-        if(this._settings.get_boolean("auto-background")) {
+
+        if (this._settings.get_boolean("auto-background")) {
             const wallpaperSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.background' });
             const wallpaperUri = wallpaperSettings.get_string('picture-uri');
             const imagePath = wallpaperUri.replace(/^file:\/\//, "");
             const modifier = this._isDarkMode() ? "dark" : "light";
             const autoBGC = Colors.getThemeColor(imagePath, modifier);
             this.bgcolor = [autoBGC, autoBGC];
+        }
+
+        if (this._settings.get_boolean("blur")) {
+            let file = Gio.File.new_for_path('/tmp/vel-dynamic-panel-blurred-bg.jpg');
+            let colorIndex = this._isDarkMode() ? 0 : 1;
+            if (file.query_exists(null)) {
+                const mixed = Colors.colorMix({ r: this.bgcolor[colorIndex][0], g: this.bgcolor[colorIndex][1], b: this.bgcolor[colorIndex][2], a: this._settings.get_int("transparent") / 100 });
+                mixed.savev('/tmp/vel-dynamic-panel-mixed-bg.jpg', 'jpeg', [], []);
+            }
+        }
+    }
+
+    _updateBlurredBG() {
+        if (this._settings.get_boolean("blur")) {
+            const wallpaperSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.background' });
+            const wallpaperUri = wallpaperSettings.get_string('picture-uri');
+            const imagePath = wallpaperUri.replace(/^file:\/\//, "");
+            let colorIndex = this._isDarkMode() ? 0 : 1;
+            const blurred = Colors.gaussianBlur(this._settings, imagePath, 30);
+            blurred.savev('/tmp/vel-dynamic-panel-blurred-bg.jpg', 'jpeg', [], []);
+            const mixed = Colors.colorMix({ r: this.bgcolor[colorIndex][0], g: this.bgcolor[colorIndex][1], b: this.bgcolor[colorIndex][2], a: this._settings.get_int("transparent") / 100 });
+            mixed.savev('/tmp/vel-dynamic-panel-mixed-bg.jpg', 'jpeg', [], []);
         }
     }
 
@@ -272,6 +302,9 @@ export default class DynamicPanelExtension extends Extension {
         // 更新新樣式並設定回
         let newStyle = [];
         propertiesAndValues[prop] = value;
+        if (value == "") {
+            delete propertiesAndValues[prop];
+        }
         for (const property in propertiesAndValues) {
             const value = propertiesAndValues[property];
             newStyle.push(`${property}: ${value};`);
@@ -310,20 +343,19 @@ export default class DynamicPanelExtension extends Extension {
         const bg_areas = [Main.panel._leftBox, Main.panel._centerBox, Main.panel._rightBox];
         switch (propname) {
             case "color-changed":
+            case "wallpaper-changed":
+            case "bg-changed":
                 for (const bg_area of bg_areas) {
                     bg_area.set_style("");
                 }
                 this._updateColorSettings();
                 this._setPanelBackground(floating);
                 this._setPanelForeground(floating);
-                break;
-            case "bg-changed":
-                for (const bg_area of bg_areas) {
-                    bg_area.set_style("");
-                }
-                this._setPanelBackground(floating);
-                this._setPanelForeground(floating);
                 this._setPanelMenuStyle(floating);
+
+                if (propname === "wallpaper-changed") {
+                    this._updateBlurredBG();
+                }
                 break;
             case "transparent-menus":
                 this._setPanelMenuStyle(floating);
@@ -333,6 +365,18 @@ export default class DynamicPanelExtension extends Extension {
                 break;
             case "allocation-changed":
                 this._setPanelAllocation(floating);
+                if(this._settings.get_boolean("blur")) {
+                    GLib.Source.remove(this._updateBgDelay);
+                    const startTime = new Date().getTime();
+                    const duration = this._settings.get_int("duration");
+                    this._updateBgDelay = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
+                        const currentTime = new Date().getTime();
+                        this._setPanelBackground(floating);
+                        if (currentTime - startTime <= duration) {
+                            return true;
+                        }
+                    })
+                }
                 break;
         }
     }
@@ -379,12 +423,15 @@ export default class DynamicPanelExtension extends Extension {
 
     // 設定面板背景
     _setPanelBackground(floating) {
-        this.ani2 = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
+        this._ani2 = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
             const _transparent = this._settings.get_int("transparent") / 100;
-
+            this._updateStyle(Main.panel, "transition", `${this._settings.get_int("duration")}ms`);
             let bg_areas = [Main.panel];
             if (this._settings.get_int('background-mode') === 1) {
                 this._updateStyle(Main.panel, "background-color", `rgba(0, 0, 0, 0)`);
+                this._updateStyle(Main.panel, "background-image", "");
+                this._updateStyle(Main.panel, "background-size", "");
+                this._updateStyle(Main.panel, "background-position", "");
                 bg_areas = [Main.panel._leftBox, Main.panel._centerBox, Main.panel._rightBox];
                 const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
                 const panelHeight = Main.panel.get_height() / 2 * (this._settings.get_int("radius-times") / 100) * scale;
@@ -397,20 +444,49 @@ export default class DynamicPanelExtension extends Extension {
                 Main.panel.remove_style_class_name(this.floatingPanelClass);
                 for (const bg_area of bg_areas) {
                     this._updateStyle(bg_area, "background-color", `rgba(0, 0, 0, 0)`);
+                    this._updateStyle(bg_area, "background-image", "");
                 }
             } else if (floating) {
                 Main.panel.add_style_class_name(this.floatingPanelClass);
-                if (this._isDarkMode()) {
-                    for (const bg_area of bg_areas) {
-                        this._updateStyle(bg_area, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
+                if (this._settings.get_boolean("blur")) {
+                    const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+                    const panelHeight = Main.panel.get_height();
+                    const maxHeight = (this._settings.get_int("top-margin") + panelHeight + 5) * scale;
+                    if (this._settings.get_int('background-mode') === 1) {
+                        for (const bg_area of bg_areas) {
+                            this._updateStyle(bg_area, "background-image", "url(/tmp/vel-dynamic-panel-mixed-bg.jpg)");
+                            this._updateStyle(bg_area, "background-size", `${Main.layoutManager.primaryMonitor.width}px ${maxHeight + 20}px`);
+                            this._updateStyle(bg_area, "background-position", `-${Main.layoutManager.panelBox.translation_x + bg_area.x}px -${Main.layoutManager.panelBox.translation_y + bg_area.y + 20}px`);
+                        }
+                    } else {
+                        for (const bg_area of bg_areas) {
+                            this._updateStyle(bg_area, "background-image", "url(/tmp/vel-dynamic-panel-mixed-bg.jpg)");
+                            this._updateStyle(bg_area, "background-size", `${Main.layoutManager.primaryMonitor.width}px ${maxHeight + 20}px`);
+                            this._updateStyle(bg_area, "background-position", `-${Main.layoutManager.panelBox.translation_x}px -${Main.layoutManager.panelBox.translation_y + 20}px`);
+                        }
                     }
                 } else {
-                    for (const bg_area of bg_areas) {
-                        this._updateStyle(bg_area, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
+                    this._updateStyle(Main.panel, "background-image", "");
+                    this._updateStyle(Main.panel, "background-size", "");
+                    this._updateStyle(Main.panel, "background-position", "");
+                    for (const bg_area of [Main.panel._leftBox, Main.panel._centerBox, Main.panel._rightBox]) {
+                        this._updateStyle(bg_area, "background-image", "");
+                        this._updateStyle(bg_area, "background-size", "");
+                        this._updateStyle(bg_area, "background-position", "");
+                    }
+                    if (this._isDarkMode()) {
+                        for (const bg_area of bg_areas) {
+                            this._updateStyle(bg_area, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
+                        }
+                    } else {
+                        for (const bg_area of bg_areas) {
+                            this._updateStyle(bg_area, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
+                        }
                     }
                 }
             } else if (this._settings.get_int("solid-type") == 1) {
                 Main.panel.remove_style_class_name(this.floatingPanelClass);
+                this._updateStyle(Main.panel, "background-image", "");
                 if (this._isDarkMode()) {
                     for (const bg_area of bg_areas) {
                         this._updateStyle(bg_area, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
@@ -422,6 +498,7 @@ export default class DynamicPanelExtension extends Extension {
                 }
             } else if (this._settings.get_boolean("colors-use-in-static")) {
                 Main.panel.remove_style_class_name(this.floatingPanelClass);
+                this._updateStyle(Main.panel, "background-image", "");
                 for (const bg_area of bg_areas) {
                     bg_area.set_style("");
                 }
@@ -558,6 +635,18 @@ export default class DynamicPanelExtension extends Extension {
                 duration: duration,
                 mode: Clutter.AnimationMode.EASE_OUT_SINE
             })
+            if(this._settings.get_boolean("blur")) {
+                GLib.Source.remove(this._updateBgDelay);
+                const startTime = new Date().getTime();
+                const duration = this._settings.get_int("duration");
+                this._updateBgDelay = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
+                    const currentTime = new Date().getTime();
+                    this._setPanelBackground(floating);
+                    if (currentTime - startTime <= duration) {
+                        return true;
+                    }
+                })
+            }
         } else if (this._settings.get_int('solid-type') === 0) {
             this._clearPeekEffect();
 
@@ -568,6 +657,18 @@ export default class DynamicPanelExtension extends Extension {
                 duration: duration,
                 mode: Clutter.AnimationMode.EASE_OUT_SINE
             })
+            if(this._settings.get_boolean("blur")) {
+                GLib.Source.remove(this._updateBgDelay);
+                const startTime = new Date().getTime();
+                const duration = this._settings.get_int("duration");
+                this._updateBgDelay = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
+                    const currentTime = new Date().getTime();
+                    this._setPanelBackground(floating);
+                    if (currentTime - startTime <= duration) {
+                        return true;
+                    }
+                })
+            }
         } else {
             if (!this._panelHiddenConnect) {
                 Main.layoutManager.panelBox.ease({

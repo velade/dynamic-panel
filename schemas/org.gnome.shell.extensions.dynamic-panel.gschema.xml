@@ -96,5 +96,10 @@
 			<summary>The type of Solid Mode the panel is in. 0 is a dock similar to the default GNOME panel, 1 will hide the panel.</summary>
 			<description/>
 		</key>
+		<key type="b" name="blur">
+			<default>false</default>
+			<summary>built-in blur effect in the switch</summary>
+			<description/>
+		</key>
 	</schema>
 </schemalist>

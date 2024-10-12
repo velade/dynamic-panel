@@ -1,5 +1,6 @@
-import Gio from "gi://Gio";
 import GdkPixbuf from "gi://GdkPixbuf";
+import St from "gi://St";
+import * as Main from "resource:///org/gnome/shell/ui/main.js";
 export default class Colors {
     static rgbToHsl(r, g, b) {
         r /= 255, g /= 255, b /= 255;
@@ -112,12 +113,161 @@ export default class Colors {
         }
         const entries = Array.from(colors.entries());
         entries.sort((a, b) => b[1] - a[1]);
-        let hslC =  Colors.rgbToHsl(...entries[0][0].split(/\s*,\s*/).map(Number));
-        if(modifier == "light"){
+        let hslC = Colors.rgbToHsl(...entries[0][0].split(/\s*,\s*/).map(Number));
+        if (modifier == "light") {
             hslC[2] = 60;
-        }else {
+        } else {
             hslC[2] = 30;
         }
         return Colors.hslToRgb(...hslC);
+    }
+
+    static gaussianBlur(settings, imagePath, radius = 30) {
+        let pixbuf = GdkPixbuf.Pixbuf.new_from_file(imagePath);
+        const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+        const panelHeight = Main.panel.get_height();
+        const maxHeight = (settings.get_int("top-margin") + panelHeight + 5) * scale;
+        pixbuf = pixbuf.new_subpixbuf(0, 0, pixbuf.get_width(), Math.round(pixbuf.get_width() / Main.layoutManager.primaryMonitor.width * maxHeight));
+
+        let pixbuf_fill = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, pixbuf.get_has_alpha(), 8, pixbuf.get_width(), pixbuf.get_height() + 20);
+        pixbuf.copy_area(0, 0, pixbuf.get_width(), pixbuf.get_height(), pixbuf_fill, 0, 0);
+        pixbuf.copy_area(0, 0, pixbuf.get_width(), pixbuf.get_height(), pixbuf_fill, 0, 20);
+        pixbuf = pixbuf_fill;
+
+        let width = pixbuf.get_width();
+        let height = pixbuf.get_height();
+        let hasAlpha = pixbuf.get_has_alpha();
+        let rowstride = pixbuf.get_rowstride();
+        let pixels = pixbuf.get_pixels();
+        let newPixels = new Uint8Array(pixels.length);
+
+        // 生成高斯核
+        let kernel = [];
+        let sigma = radius / 3;
+        let sum = 0;
+        for (let x = -radius; x <= radius; x++) {
+            let g = Math.exp(-(x * x) / (2 * sigma * sigma));
+            kernel.push(g);
+            sum += g;
+        }
+        // 歸一化
+        for (let i = 0; i < kernel.length; i++) {
+            kernel[i] /= sum;
+        }
+
+        // 水平方向模糊
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                let r = 0, g = 0, b = 0, a = 0;
+                for (let i = -radius; i <= radius; i++) {
+                    let x1 = Math.min(width - 1, Math.max(0, x + i));
+                    let offset = (y * rowstride) + (x1 * (hasAlpha ? 4 : 3));
+                    r += pixels[offset] * kernel[i + radius];
+                    g += pixels[offset + 1] * kernel[i + radius];
+                    b += pixels[offset + 2] * kernel[i + radius];
+                    if (hasAlpha) {
+                        a += pixels[offset + 3] * kernel[i + radius];
+                    }
+                }
+                let offset = (y * rowstride) + (x * (hasAlpha ? 4 : 3));
+                newPixels[offset] = Math.round(r);
+                newPixels[offset + 1] = Math.round(g);
+                newPixels[offset + 2] = Math.round(b);
+                if (hasAlpha) {
+                    newPixels[offset + 3] = Math.round(a);
+                }
+            }
+        }
+
+        // 垂直方向模糊
+        pixels = newPixels;
+        newPixels = new Uint8Array(pixels.length);
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                let r = 0, g = 0, b = 0, a = 0;
+                for (let i = -radius; i <= radius; i++) {
+                    let y1 = Math.min(height - 1, Math.max(0, y + i));
+                    let offset = (y1 * rowstride) + (x * (hasAlpha ? 4 : 3));
+                    r += pixels[offset] * kernel[i + radius];
+                    g += pixels[offset + 1] * kernel[i + radius];
+                    b += pixels[offset + 2] * kernel[i + radius];
+                    if (hasAlpha) {
+                        a += pixels[offset + 3] * kernel[i + radius];
+                    }
+                }
+                let offset = (y * rowstride) + (x * (hasAlpha ? 4 : 3));
+                newPixels[offset] = Math.round(r);
+                newPixels[offset + 1] = Math.round(g);
+                newPixels[offset + 2] = Math.round(b);
+                if (hasAlpha) {
+                    newPixels[offset + 3] = Math.round(a);
+                }
+            }
+        }
+
+        // 创建新的 Pixbuf
+        let newPixbuf = GdkPixbuf.Pixbuf.new_from_data(
+            newPixels,
+            GdkPixbuf.Colorspace.RGB,
+            hasAlpha,
+            8,
+            width,
+            height,
+            rowstride,
+            null,
+            null
+        );
+
+        return newPixbuf;
+    }
+
+    static colorMix(color = { r: 0, g: 0, b: 0, a: 0.5 }, imagePath = "/tmp/vel-dynamic-panel-blurred-bg.jpg") {
+        let pixbuf = GdkPixbuf.Pixbuf.new_from_file(imagePath);
+        let width = pixbuf.get_width();
+        let height = pixbuf.get_height();
+        let hasAlpha = pixbuf.get_has_alpha();
+        let rowstride = pixbuf.get_rowstride();
+        let pixels = pixbuf.get_pixels();
+        let newPixels = new Uint8Array(pixels.length);
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                let r, g, b, a = 0;
+                let offset = (y * rowstride) + (x * (hasAlpha ? 4 : 3));
+
+                r = pixels[offset];
+                g = pixels[offset + 1];
+                b = pixels[offset + 2];
+                if (hasAlpha) {
+                    a = pixels[offset + 3];
+                }
+
+                // 混合顏色，這裡使用簡單的 alpha 混合
+                r = (1 - color.a) * r + (color.a * color.r * 255);
+                g = (1 - color.a) * g + (color.a * color.g * 255);
+                b = (1 - color.a) * b + (color.a * color.b * 255);
+
+                newPixels[offset] = Math.round(r);
+                newPixels[offset + 1] = Math.round(g);
+                newPixels[offset + 2] = Math.round(b);
+                if (hasAlpha) {
+                    newPixels[offset + 3] = Math.round(a);
+                }
+            }
+        }
+
+        let newPixbuf = GdkPixbuf.Pixbuf.new_from_data(
+            newPixels,
+            GdkPixbuf.Colorspace.RGB,
+            hasAlpha,
+            8,
+            width,
+            height,
+            rowstride,
+            null,
+            null
+        );
+
+        return newPixbuf
     }
 }

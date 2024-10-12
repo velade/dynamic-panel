@@ -137,6 +137,8 @@ export default class extends ExtensionPreferences {
         rgba.parse(settings.get_string('light-fg-color'));
         cLFGColor.set_rgba(rgba);
 
+        sAutoBG.set_active(settings.get_boolean("auto-background"));
+
         let rowColors = new Adw.ExpanderRow({ title: _('自訂顏色') });
         let rowAutoBG = new Adw.ActionRow({ title: _("多彩"), subtitle: _("自動從桌布取得顏色") });
         rowAutoBG.add_suffix(sAutoBG);
@@ -273,6 +275,19 @@ export default class extends ExtensionPreferences {
         rowTransparent.add_suffix(sTransparent);
         gFloating.add(rowTransparent);
 
+        // 模糊開關
+        let sBlur = new Gtk.Switch({
+            valign: Gtk.Align.CENTER,
+        });
+        sBlur.connect('state-set', (sw, state) => {
+            if (state == settings.get_boolean('blur')) return;
+            settings.set_boolean('blur', state);
+        })
+        sBlur.set_active(settings.get_boolean('blur'));
+        let rowBlur = new Adw.ActionRow({ title: _('模糊效果') });
+        rowBlur.add_suffix(sBlur);
+        gFloating.add(rowBlur);
+
         // 頂部邊距
         let spTMargin = new Gtk.SpinButton({
             adjustment: new Gtk.Adjustment({
@@ -357,6 +372,14 @@ export default class extends ExtensionPreferences {
             rowWidth.sensitive = false;
         } else {
             rowWidth.sensitive = true;
+        }
+
+        if (settings.get_boolean('auto-background')) {
+            rowDBGColor.visible = false;
+            rowLBGColor.visible = false;
+        } else {
+            rowDBGColor.visible = true;
+            rowLBGColor.visible = true;
         }
 
         // 向頁面添加組
