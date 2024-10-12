@@ -2,7 +2,7 @@ Dynamic Top Panel
 Originally inspired by the floating panel design in KDE Plasma 6, it presents a translucent floating bar effect when there are no windows nearby, and a solid panel style when windows are close. It supports Gnome's dark and light mode switching. You can set custom colors for dark and light modes respectively. And there are more settings!
 
 Floating Mode
-When there are no windows near the top panel, it will be in floating mode.Floating mode only has a translucent effect, no blur effect. Currently, if you want a blur effect, it is recommended to use Blur my shell's static pipeline for the panel. Blur my shell's dynamic mode will not have rounded corners, which is a problem with Blur my shell.
+When there are no windows near the top panel, it will be in floating mode.Floating mode has a translucent effect and a built-in simple blur effect. if you want a more advanced and more controllable blur effect, it is recommended to use Blur my shell's static pipeline for the panel. Blur my shell's dynamic mode will not have rounded corners, which is a problem with Blur my shell.
 
 Solid Mode
 When any window is close enough (almost touching) to the top panel, the top panel will become an opaque dock (same as the default in Gnome, but you can apply custom colors to it), which can better blend with maximized windows, unlike themes that are always floating and have a "light leakage" phenomenon.
@@ -17,7 +17,7 @@ Thanks to Google Gemini for the help provided in the research and learning of Gj
 最初靈感來源於 KDE Plasma 6 的懸浮面板的設計，在附近沒有視窗時呈現半透明懸浮條效果，而當視窗靠近時則呈現實色面板的樣式。支援 Gnome 的暗色模式和亮色模式切換。可針對暗色和亮色模式分別設定自訂顏色。還有更多設定！
 
 懸浮模式
-當頂部面板附近沒有視窗時，會呈現懸浮模式。懸浮模式僅僅有半透明效果，沒有模糊效果，目前如果想要模糊效果，建議搭配 Blur my shell 對於面板的靜態 pipeline 使用。Blur my shell 動態模式會沒有圓角，這是 Blur my shell 的問題。
+當頂部面板附近沒有視窗時，會呈現懸浮模式。懸浮模式有半透明效果，內建簡易模糊效果，如果想要更高級和細緻的模糊效果，建議搭配 Blur my shell 對於面板的靜態 pipeline 使用。Blur my shell 動態模式會沒有圓角，這是 Blur my shell 的問題。
 
 實體模式
 當有任何視窗足夠靠近（幾乎接觸）頂部面板時，頂部面板將會變為不透明的停靠欄（和 Gnome 默認的一樣，但你可以對其應用自訂顏色），與最大化視窗可以更好的融合，而不像主題一樣始終懸浮會有「漏光」的現象。

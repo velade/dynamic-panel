@@ -13,7 +13,7 @@
 
 **你可以任意组合各种样式，但不恰当的组合可能不会带来好的视觉效果。**
 
-悬浮模式仅仅有半透明效果，没有模糊效果，目前如果想要模糊效果，建议搭配 Blur my shell 对面板的静态 pipeline 使用。Blur my shell 动态模式会没有圆角，这是 Blur my shell 的问题。
+悬浮模式有半透明效果，内置模糊效果，如果想要更高级和细致的模糊效果，建议搭配 Blur my shell 对面板的静态 pipeline 使用。Blur my shell 动态模式会没有圆角，这是 Blur my shell 的问题。
 ### Blur my shell 设置
 ![Blur my shell 设置](readme_images/bms_settings1.png)
 
