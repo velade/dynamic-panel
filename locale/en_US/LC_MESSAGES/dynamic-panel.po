@@ -117,3 +117,6 @@ msgstr "Multicolored"
 
 msgid "自動從桌布取得顏色"
 msgstr "Automatically get color from wallpaper"
+
+msgid "模糊效果"
+msgstr "Blur effect"

@@ -118,3 +118,6 @@ msgstr ""
 
 msgid "自動從桌布取得顏色"
 msgstr ""
+
+msgid "模糊效果"
+msgstr ""

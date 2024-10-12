@@ -117,3 +117,6 @@ msgstr "多彩"
 
 msgid "自動從桌布取得顏色"
 msgstr "自动从壁纸获取颜色"
+
+msgid "模糊效果"
+msgstr "模糊效果"
