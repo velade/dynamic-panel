@@ -122,3 +122,21 @@ msgstr "Automaticky získat barvu z tapety"
 
 msgid "模糊效果"
 msgstr "Efekt rozostření"
+
+msgid "無障礙設定"
+msgstr "Nastavení usnadnění"
+
+msgid "盲點補丁"
+msgstr "Oprava kliknutí snadno"
+
+msgid "為懸浮模式添加額外點擊區域，以恢復絕對邊角的點擊能力"
+msgstr "Přidat další klikací oblasti pro režim vznášení, aby se obnovila možnost klikání v absolutních rozích"
+
+msgid "總覽（左）"
+msgstr "Přehled (vlevo)"
+
+msgid "通知中心（中）"
+msgstr "Centrum oznámení (uprostřed)"
+
+msgid "快速設定（右）"
+msgstr "Rychlé nastavení (vpravo)"

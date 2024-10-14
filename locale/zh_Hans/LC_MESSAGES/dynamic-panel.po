@@ -120,3 +120,21 @@ msgstr "自动从壁纸获取颜色"
 
 msgid "模糊效果"
 msgstr "模糊效果"
+
+msgid "無障礙設定"
+msgstr "无障碍设置"
+
+msgid "盲點補丁"
+msgstr "盲点补丁"
+
+msgid "為懸浮模式添加額外點擊區域，以恢復絕對邊角的點擊能力"
+msgstr "为悬浮模式添加额外点击区域，以恢复绝对边角的点击能力"
+
+msgid "總覽（左）"
+msgstr "总览（左）"
+
+msgid "通知中心（中）"
+msgstr "通知中心（中）"
+
+msgid "快速設定（右）"
+msgstr "快速设置（右）"
