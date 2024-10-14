@@ -187,7 +187,7 @@ export default class DynamicPanelExtension extends Extension {
         }
 
         // -- 清除附加觸發區
-        for (const trigger of this._addonTriggers) {
+        for (const trigger of Object.values(this._addonTriggers)) {
             trigger.destroy();
         }
         this._addonTriggers = null;
