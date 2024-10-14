@@ -25,6 +25,7 @@ export default class DynamicPanelExtension extends Extension {
         this._panelButtons = [];
         this._panelHiddenConnect = null;
         this._squeezeCount = null;
+        this._addonTriggers = null;
     }
 
     enable() {
@@ -37,6 +38,7 @@ export default class DynamicPanelExtension extends Extension {
         this._panelButtons = [];
         this._panelHiddenConnect = null;
         this._squeezeCount = 0;
+        this._addonTriggers = {};
 
         // 讀取設定並開始監控變化
         this._settings = this.getSettings();
@@ -58,7 +60,10 @@ export default class DynamicPanelExtension extends Extension {
             this._settings.connect("changed::auto-background", () => { this._updatePanelSingleStyle("color-changed") }),
             this._settings.connect("changed::colors-use-in-static", () => { this._updatePanelSingleStyle("bg-changed") }),
             this._settings.connect("changed::background-mode", () => { this._updatePanelSingleStyle("bg-changed") }),
-            this._settings.connect("changed::blur", () => { this._updatePanelSingleStyle("wallpaper-changed") })
+            this._settings.connect("changed::blur", () => { this._updatePanelSingleStyle("wallpaper-changed") }),
+            this._settings.connect("changed::addon-trigger-left", () => { this._updatePanelSingleStyle("trigger-changed") }),
+            this._settings.connect("changed::addon-trigger-center", () => { this._updatePanelSingleStyle("trigger-changed") }),
+            this._settings.connect("changed::addon-trigger-right", () => { this._updatePanelSingleStyle("trigger-changed") })
         ])
 
         // 監控總覽界面顯示狀態
@@ -181,6 +186,12 @@ export default class DynamicPanelExtension extends Extension {
             }
         }
 
+        // -- 清除附加觸發區
+        for (const trigger of this._addonTriggers) {
+            trigger.destroy();
+        }
+        this._addonTriggers = null;
+
     }
 
     // 窗口添加事件
@@ -233,6 +244,7 @@ export default class DynamicPanelExtension extends Extension {
         }
     }
 
+    // 更新模糊背景
     _updateBlurredBG() {
         if (this._settings.get_boolean("blur")) {
             const wallpaperSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.background' });
@@ -243,6 +255,79 @@ export default class DynamicPanelExtension extends Extension {
             blurred.savev('/tmp/vel-dynamic-panel-blurred-bg.jpg', 'jpeg', [], []);
             const mixed = Colors.colorMix({ r: this.bgcolor[colorIndex][0], g: this.bgcolor[colorIndex][1], b: this.bgcolor[colorIndex][2], a: this._settings.get_int("transparent") / 100 });
             mixed.savev('/tmp/vel-dynamic-panel-mixed-bg.jpg', 'jpeg', [], []);
+        }
+    }
+
+    // 設定附加觸發區域
+    _setAddonTrigger(floating) {
+        // 清理現有觸發區域
+        for (const trigger of Object.values(this._addonTriggers)) {
+            trigger.destroy();
+        }
+        this._addonTriggers = {};
+        if (floating) {
+            // Activities
+            let h = this._settings.get_int("top-margin");
+            if (this._settings.get_boolean("addon-trigger-left")) {
+                let activities = Main.panel.statusArea.activities;
+                let w = Main.panel._leftBox.get_preferred_width(0)[1] + 20;
+                let overlay = this._addonTriggers["Activities"] = new St.Bin({
+                    style_class: "vel-dp-addon-trigger-left",
+                    opacity: 1,
+                    reactive: true,
+                    x: 0,
+                    y: 0,
+                    width: w,
+                    height: h
+                });
+
+                Main.uiGroup.add_child(overlay);
+
+                overlay.connect('button-press-event', () => {
+                    activities.menu.open()
+                });
+            }
+            // Date Menu
+            if (this._settings.get_boolean("addon-trigger-center")) {
+                let dateMenu = Main.panel.statusArea.dateMenu;
+                let w = Main.panel._centerBox.get_preferred_width(0)[1] + 20;
+                let x = (Main.layoutManager.primaryMonitor.width - w) / 2;
+                let overlay = this._addonTriggers["dateMenu"] = new St.Bin({
+                    style_class: "vel-dp-addon-trigger-center",
+                    opacity: 1,
+                    reactive: true,
+                    x: x,
+                    y: 0,
+                    width: w,
+                    height: h
+                });
+
+                Main.uiGroup.add_child(overlay);
+
+                overlay.connect('button-press-event', () => {
+                    dateMenu.menu.open()
+                });
+            }
+            // Quick Settings
+            if (this._settings.get_boolean("addon-trigger-right")) {
+                let quickSettings = Main.panel.statusArea.quickSettings;
+                let w = Main.panel._rightBox.get_preferred_width(0)[1] + 20;
+                let overlay = this._addonTriggers["quickSettings"] = new St.Bin({
+                    style_class: "vel",
+                    opacity: 1,
+                    reactive: true,
+                    x: Main.layoutManager.primaryMonitor.width - w,
+                    y: 0,
+                    width: w,
+                    height: h
+                });
+
+                Main.uiGroup.add_child(overlay);
+
+                overlay.connect('button-press-event', () => {
+                    quickSettings.menu.open()
+                });
+            }
         }
     }
 
@@ -365,7 +450,8 @@ export default class DynamicPanelExtension extends Extension {
                 break;
             case "allocation-changed":
                 this._setPanelAllocation(floating);
-                if(this._settings.get_boolean("blur")) {
+                this._setAddonTrigger(floating);
+                if (this._settings.get_boolean("blur")) {
                     GLib.Source.remove(this._updateBgDelay);
                     const startTime = new Date().getTime();
                     const duration = this._settings.get_int("duration");
@@ -377,6 +463,9 @@ export default class DynamicPanelExtension extends Extension {
                         }
                     })
                 }
+                break;
+            case "trigger-changed":
+                this._setAddonTrigger(floating);
                 break;
         }
     }
@@ -390,6 +479,7 @@ export default class DynamicPanelExtension extends Extension {
             this._setPanelMenuStyle(false);
             this._setPanelAllocation(false);
             this._setPanelRadius(false);
+            this._setAddonTrigger(false);
             return;
         }
         if (!Main.layoutManager.primaryMonitor) {
@@ -408,16 +498,16 @@ export default class DynamicPanelExtension extends Extension {
             this._setPanelMenuStyle(floating);
             this._setPanelAllocation(floating);
             this._setPanelRadius(floating);
+            this._setAddonTrigger(floating);
         } else if (forceUpdate) {
             if (forceFloating === null) forceFloating = floating;
-
             this._clearPeekEffect();
-
             this._setPanelBackground(forceFloating);
             this._setPanelForeground(forceFloating);
             this._setPanelMenuStyle(forceFloating);
             this._setPanelAllocation(forceFloating);
             this._setPanelRadius(forceFloating);
+            this._setAddonTrigger(forceFloating);
         }
     }
 
@@ -635,7 +725,7 @@ export default class DynamicPanelExtension extends Extension {
                 duration: duration,
                 mode: Clutter.AnimationMode.EASE_OUT_SINE
             })
-            if(this._settings.get_boolean("blur")) {
+            if (this._settings.get_boolean("blur")) {
                 GLib.Source.remove(this._updateBgDelay);
                 const startTime = new Date().getTime();
                 const duration = this._settings.get_int("duration");
@@ -657,7 +747,7 @@ export default class DynamicPanelExtension extends Extension {
                 duration: duration,
                 mode: Clutter.AnimationMode.EASE_OUT_SINE
             })
-            if(this._settings.get_boolean("blur")) {
+            if (this._settings.get_boolean("blur")) {
                 GLib.Source.remove(this._updateBgDelay);
                 const startTime = new Date().getTime();
                 const duration = this._settings.get_int("duration");

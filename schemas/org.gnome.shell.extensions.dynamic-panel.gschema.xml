@@ -101,5 +101,20 @@
 			<summary>built-in blur effect in the switch</summary>
 			<description/>
 		</key>
+		<key type="b" name="addon-trigger-left">
+			<default>false</default>
+			<summary>addon trigger area for activities</summary>
+			<description/>
+		</key>
+		<key type="b" name="addon-trigger-center">
+			<default>false</default>
+			<summary>addon trigger area for datamenu</summary>
+			<description/>
+		</key>
+		<key type="b" name="addon-trigger-right">
+			<default>false</default>
+			<summary>addon trigger area for quick settings</summary>
+			<description/>
+		</key>
 	</schema>
 </schemalist>
