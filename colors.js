@@ -243,9 +243,9 @@ export default class Colors {
                 }
 
                 // 混合顏色，這裡使用簡單的 alpha 混合
-                r = (1 - color.a) * r + (color.a * color.r * 255);
-                g = (1 - color.a) * g + (color.a * color.g * 255);
-                b = (1 - color.a) * b + (color.a * color.b * 255);
+                r = (1 - color.a) * r + (color.a * color.r);
+                g = (1 - color.a) * g + (color.a * color.g);
+                b = (1 - color.a) * b + (color.a * color.b);
 
                 newPixels[offset] = Math.round(r);
                 newPixels[offset + 1] = Math.round(g);

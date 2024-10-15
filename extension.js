@@ -22,7 +22,6 @@ export default class DynamicPanelExtension extends Extension {
         this._ani = null;
         this._ani2 = null;
         this._updateBgDelay = null;
-        this._panelButtons = [];
         this._panelHiddenConnect = null;
         this._squeezeCount = null;
         this._addonTriggers = null;
@@ -35,7 +34,6 @@ export default class DynamicPanelExtension extends Extension {
 
         this._animations = new Map();
 
-        this._panelButtons = [];
         this._panelHiddenConnect = null;
         this._squeezeCount = 0;
         this._addonTriggers = {};
@@ -98,24 +96,11 @@ export default class DynamicPanelExtension extends Extension {
             bgsettings.connect('changed::picture-uri', () => { this._updatePanelSingleStyle("wallpaper-changed") })
         ])
 
-        // 監控Panel內容變化
-        this._actorSignalIds.set(Main.panel, [
-            Main.panel._leftBox.connect("child-added", this._updatePanelButtons.bind(this)),
-            Main.panel._leftBox.connect("child-removed", this._updatePanelButtons.bind(this)),
-            Main.panel._centerBox.connect("child-added", this._updatePanelButtons.bind(this)),
-            Main.panel._centerBox.connect("child-removed", this._updatePanelButtons.bind(this)),
-            Main.panel._rightBox.connect("child-added", this._updatePanelButtons.bind(this)),
-            Main.panel._rightBox.connect("child-removed", this._updatePanelButtons.bind(this))
-        ]);
-
         // 更新顏色設定
         this._updateColorSettings();
 
         // 更新模糊背景
         this._updateBlurredBG();
-
-        // 更新panelButtons
-        this._updatePanelButtons();
 
         // 首次應用主題和樣式
         this._updatePanelStyle();
@@ -166,24 +151,23 @@ export default class DynamicPanelExtension extends Extension {
         Main.panel._rightBox.set_style("");
 
         // -- 清除面板前景色
-        for (const element of this._panelButtons) {
+        for (const element of Object.values(Main.panel.statusArea)) {
             if (element) {
                 element.set_style("");
             }
         }
-        for (const dot of Main.panel._leftBox.get_children()[0].get_children()[0].get_children()[0].get_children()) {
+        for (const dot of Main.panel.statusArea.activities.first_child.get_children()) {
             dot._dot.set_style("");
         }
-        this._panelButtons = null;
 
         // -- 清除面板選單樣式
-        for (const pmenu of Main.uiGroup.get_children()) {
-            if (!!pmenu.has_style_class_name &&
-                pmenu.has_style_class_name("panel-menu")
-            ) {
-                pmenu.remove_style_class_name(this.floatingPanelMenuClass);
-                pmenu._delegate.box.set_style("");
-            }
+        let panelMenus = [];
+        for (const panelButton of Object.values(Main.panel.statusArea)) {
+            if(panelButton.menu && panelButton.menu.actor && panelButton.menu.box) panelMenus.push(panelButton.menu);
+        }
+        for (const pmenu of panelMenus) {
+                pmenu.actor.remove_style_class_name(this.floatingPanelMenuClass);
+                pmenu.box.set_style("");
         }
 
         // -- 清除附加觸發區
@@ -398,20 +382,6 @@ export default class DynamicPanelExtension extends Extension {
         obj.set_style(newStyle);
     }
 
-    // 更新面板按鈕列表
-    _updatePanelButtons() {
-        for (const box of [Main.panel._leftBox, Main.panel._centerBox, Main.panel._rightBox]) {
-            for (const child0 of box.get_children()) {
-                if (!child0.get_children) continue;
-                for (const child1 of child0.get_children()) {
-                    if (child1.has_style_class_name && child1.has_style_class_name("panel-button")) {
-                        this._panelButtons.push(child1);
-                    }
-                }
-            }
-        }
-    }
-
     // 清除自動隱藏相關影響
     _clearPeekEffect() {
         PointerWatcher.getPointerWatcher()._removeWatch(this._panelHiddenConnect);
@@ -610,19 +580,19 @@ export default class DynamicPanelExtension extends Extension {
     // 設定面板前景
     _setPanelForeground(floating) {
         const colorSet = this._isDarkMode() ? 0 : 1;
-
+        const _panelButtons = Object.values(Main.panel.statusArea);
         if (floating || this._settings.get_boolean("colors-use-in-static")) {
-            for (const element of this._panelButtons) {
+            for (const element of _panelButtons) {
                 this._updateStyle(element, "color", `rgb(${this.fgcolor[colorSet][0]}, ${this.fgcolor[colorSet][1]}, ${this.fgcolor[colorSet][2]})`);
             }
-            for (const dot of Main.panel._leftBox.get_children()[0].get_children()[0].get_children()[0].get_children()) {
+            for (const dot of Main.panel.statusArea.activities.first_child.get_children()) {
                 this._updateStyle(dot._dot, "background-color", `rgb(${this.fgcolor[colorSet][0]}, ${this.fgcolor[colorSet][1]}, ${this.fgcolor[colorSet][2]})`);
             }
         } else {
-            for (const element of this._panelButtons) {
+            for (const element of _panelButtons) {
                 element.set_style("");
             }
-            for (const dot of Main.panel._leftBox.get_children()[0].get_children()[0].get_children()[0].get_children()) {
+            for (const dot of Main.panel.statusArea.activities.first_child.get_children()) {
                 dot._dot.set_style("");
             }
         }
@@ -631,64 +601,48 @@ export default class DynamicPanelExtension extends Extension {
     // 設定面板選單樣式
     _setPanelMenuStyle(floating) {
         const _transparent = this._settings.get_int("transparent") / 100;
+        let panelMenus = [];
+        for (const panelButton of Object.values(Main.panel.statusArea)) {
+            if(panelButton.menu && panelButton.menu.actor && panelButton.menu.box) panelMenus.push(panelButton.menu);
+        }
         if (this._settings.get_boolean("transparent-menus")) { // 總開關：是否對面板選單應用樣式
             if (floating || (this._settings.get_boolean("transparent-menus-keep-alpha") && this._settings.get_boolean("colors-use-in-static")) || this._settings.get_int("solid-type") == 1) { // 浮動 或 保持透明度的同時將顏色應用到實體模式 或 實體模式為自動隱藏
-                for (const pmenu of Main.uiGroup.get_children()) {
-                    if (!!pmenu.has_style_class_name &&
-                        pmenu.has_style_class_name("panel-menu")
-                    ) {
-                        pmenu.add_style_class_name(this.floatingPanelMenuClass);
-                        if (this._isDarkMode()) {
-                            this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
-                        } else {
-                            this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
-                        }
+                for (const pmenu of panelMenus) {
+                    pmenu.actor.add_style_class_name(this.floatingPanelMenuClass);
+                    if (this._isDarkMode()) {
+                        this._updateStyle(pmenu.box, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, ${_transparent})`);
+                    } else {
+                        this._updateStyle(pmenu.box, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, ${_transparent})`);
                     }
                 }
             } else if (this._settings.get_boolean("transparent-menus-keep-alpha")) { // 實體模式 未應用自訂顏色 但保持透明度
-                for (const pmenu of Main.uiGroup.get_children()) {
-                    if (!!pmenu.has_style_class_name &&
-                        pmenu.has_style_class_name("panel-menu")
-                    ) {
-                        pmenu.add_style_class_name(this.floatingPanelMenuClass);
-                        if (this._isDarkMode()) {
-                            this._updateStyle(pmenu._delegate.box, "background-color", `rgba(53, 53, 53, ${_transparent})`);
-                        } else {
-                            this._updateStyle(pmenu._delegate.box, "background-color", `rgba(245, 245, 245, ${_transparent})`);
-                        }
+                for (const pmenu of panelMenus) {
+                    pmenu.actor.add_style_class_name(this.floatingPanelMenuClass);
+                    if (this._isDarkMode()) {
+                        this._updateStyle(pmenu.box, "background-color", `rgba(53, 53, 53, ${_transparent})`);
+                    } else {
+                        this._updateStyle(pmenu.box, "background-color", `rgba(245, 245, 245, ${_transparent})`);
                     }
                 }
             } else if (this._settings.get_boolean("colors-use-in-static")) { // 實體模式 不保持透明度 但應用自訂顏色
-                for (const pmenu of Main.uiGroup.get_children()) {
-                    if (!!pmenu.has_style_class_name &&
-                        pmenu.has_style_class_name("panel-menu")
-                    ) {
-                        pmenu.add_style_class_name(this.floatingPanelMenuClass);
-                        if (this._isDarkMode()) {
-                            this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, 1)`);
-                        } else {
-                            this._updateStyle(pmenu._delegate.box, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, 1)`);
-                        }
+                for (const pmenu of panelMenus) {
+                    pmenu.actor.add_style_class_name(this.floatingPanelMenuClass);
+                    if (this._isDarkMode()) {
+                        this._updateStyle(pmenu.box, "background-color", `rgba(${this.bgcolor[0][0]}, ${this.bgcolor[0][1]}, ${this.bgcolor[0][2]}, 1)`);
+                    } else {
+                        this._updateStyle(pmenu.box, "background-color", `rgba(${this.bgcolor[1][0]}, ${this.bgcolor[1][1]}, ${this.bgcolor[1][2]}, 1)`);
                     }
                 }
             } else { // 實體模式 不保持透明度 不應用自訂顏色
-                for (const pmenu of Main.uiGroup.get_children()) {
-                    if (!!pmenu.has_style_class_name &&
-                        pmenu.has_style_class_name("panel-menu")
-                    ) {
-                        pmenu.add_style_class_name(this.floatingPanelMenuClass);
-                        pmenu._delegate.box.set_style("");
-                    }
+                for (const pmenu of panelMenus) {
+                    pmenu.actor.add_style_class_name(this.floatingPanelMenuClass);
+                    pmenu.box.set_style("");
                 }
             }
         } else { // 未應用樣式 清除樣式
-            for (const pmenu of Main.uiGroup.get_children()) {
-                if (!!pmenu.has_style_class_name &&
-                    pmenu.has_style_class_name("panel-menu")
-                ) {
-                    pmenu.remove_style_class_name(this.floatingPanelMenuClass);
-                    pmenu._delegate.box.set_style("");
-                }
+            for (const pmenu of panelMenus) {
+                pmenu.actor.remove_style_class_name(this.floatingPanelMenuClass);
+                pmenu.box.set_style("");
             }
         }
     }
