@@ -163,11 +163,17 @@ export default class DynamicPanelExtension extends Extension {
         // -- 清除面板選單樣式
         let panelMenus = [];
         for (const panelButton of Object.values(Main.panel.statusArea)) {
-            if(panelButton.menu && panelButton.menu.actor && panelButton.menu.box) panelMenus.push(panelButton.menu);
+            if (panelButton.menu && panelButton.menu.actor && panelButton.menu.box) panelMenus.push(panelButton.menu);
         }
         for (const pmenu of panelMenus) {
-                pmenu.actor.remove_style_class_name(this.floatingPanelMenuClass);
-                pmenu.box.set_style("");
+            pmenu.actor.remove_style_class_name(this.floatingPanelMenuClass);
+            pmenu.box.set_style("");
+        }
+        // -- -- 日曆
+        const dateMenu = Main.panel.statusArea.dateMenu;
+        dateMenu._date.set_style("");
+        for (const item of [...dateMenu._calendar.get_children(), ...dateMenu._calendar._topBox.get_children()]) {
+            item.set_style("");
         }
 
         // -- 清除附加觸發區
@@ -603,9 +609,10 @@ export default class DynamicPanelExtension extends Extension {
         const _transparent = this._settings.get_int("transparent") / 100;
         let panelMenus = [];
         for (const panelButton of Object.values(Main.panel.statusArea)) {
-            if(panelButton.menu && panelButton.menu.actor && panelButton.menu.box) panelMenus.push(panelButton.menu);
+            if (panelButton.menu && panelButton.menu.actor && panelButton.menu.box) panelMenus.push(panelButton.menu);
         }
         if (this._settings.get_boolean("transparent-menus")) { // 總開關：是否對面板選單應用樣式
+            // Background
             if (floating || (this._settings.get_boolean("transparent-menus-keep-alpha") && this._settings.get_boolean("colors-use-in-static")) || this._settings.get_int("solid-type") == 1) { // 浮動 或 保持透明度的同時將顏色應用到實體模式 或 實體模式為自動隱藏
                 for (const pmenu of panelMenus) {
                     pmenu.actor.add_style_class_name(this.floatingPanelMenuClass);
@@ -639,10 +646,56 @@ export default class DynamicPanelExtension extends Extension {
                     pmenu.box.set_style("");
                 }
             }
+            // Foreground 
+            if (floating || this._settings.get_boolean("colors-use-in-static") || this._settings.get_int("solid-type") == 1) {
+                // 普通選單
+                for (const pmenu of panelMenus) {
+                    if (this._isDarkMode()) {
+                        this._updateStyle(pmenu.box, "color", `rgb(${this.fgcolor[0][0]}, ${this.fgcolor[0][1]}, ${this.fgcolor[0][2]})`);
+                    } else {
+                        this._updateStyle(pmenu.box, "color", `rgb(${this.fgcolor[1][0]}, ${this.fgcolor[1][1]}, ${this.fgcolor[1][2]})`);
+                    }
+                }
+                // 日曆
+                const dateMenu = Main.panel.statusArea.dateMenu;
+                let fgcolor_rgb = "";
+                if (this._isDarkMode()) {
+                    fgcolor_rgb = `${this.fgcolor[0][0]}, ${this.fgcolor[0][1]}, ${this.fgcolor[0][2]}`;
+                } else {
+                    fgcolor_rgb = `${this.fgcolor[1][0]}, ${this.fgcolor[1][1]}, ${this.fgcolor[1][2]}`;
+                }
+                this._updateStyle(dateMenu._date, "color", `rgba(${fgcolor_rgb}, 0.6)`);
+                for (const item of dateMenu._calendar.get_children()) {
+                    if (item.has_style_class_name && item.has_style_class_name("calendar-day-heading")) {
+                        this._updateStyle(item, "color", `rgba(${fgcolor_rgb}, 0.6)`);
+                    }
+                }
+                this._updateStyle(dateMenu._calendar._backButton, "color", `rgb(${fgcolor_rgb})`);
+                this._updateStyle(dateMenu._calendar._monthLabel, "color", `rgb(${fgcolor_rgb})`);
+                this._updateStyle(dateMenu._calendar._forwardButton, "color", `rgb(${fgcolor_rgb})`);
+            } else {
+                // 普通選單
+                for (const pmenu of panelMenus) {
+                    pmenu.box.set_style("");
+                }
+                // 日曆
+                const dateMenu = Main.panel.statusArea.dateMenu;
+                dateMenu._date.set_style("");
+                for (const item of [...dateMenu._calendar.get_children(), ...dateMenu._calendar._topBox.get_children()]) {
+                    item.set_style("");
+                }
+            }
         } else { // 未應用樣式 清除樣式
+            // 普通選單
             for (const pmenu of panelMenus) {
                 pmenu.actor.remove_style_class_name(this.floatingPanelMenuClass);
                 pmenu.box.set_style("");
+            }
+            // 日曆
+            const dateMenu = Main.panel.statusArea.dateMenu;
+            dateMenu._date.set_style("");
+            for (const item of [...dateMenu._calendar.get_children(), ...dateMenu._calendar._topBox.get_children()]) {
+                item.set_style("");
             }
         }
     }
