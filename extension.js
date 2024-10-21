@@ -111,36 +111,28 @@ export default class DynamicPanelExtension extends Extension {
         // 設定為false，恢復到默認樣式，帶動畫用以優雅退場。（此時所有附加內容就應該已經被清除了）
         this._updatePanelStyle(true, false);
 
-        // 清除自動隱藏功能產生的影響
-        this._panel.clearPeekEffect();
+        // -- 清除面板樣式
+        this._panel.clear();
+        this._panel = null;
+
+        // -- 清除面板選單樣式
+        this._panelMenu.clear();
+        this._panelMenu = null;
+
+        // -- 清除無障礙功能
+        this._accessibility.clear();
+        this._accessibility = null;
 
         // 二次清理確保附加的內容被清除
 
         // -- 清除動畫計時器
         GLib.Source.remove(this._delayedTimeoutId);
-        GLib.Source.remove(this._panel._radiusAnimation);
-        GLib.Source.remove(this._panel._setBgDelay);
-        GLib.Source.remove(this._panel._updateBgDelay);
 
         // -- 清除基本變量
         this._actorSignalIds = null;
         this._windowSignalIds = null;
         this._delayedTimeoutId = null;
         this._settings = null;
-        this._panel._radiusAnimation = null;
-        this._panel._setBgDelay = null;
-        this._panel._updateBgDelay = null;
-
-
-        // -- 清除面板樣式
-        this._panel.clear();
-
-        // -- 清除面板選單樣式
-        this._panelMenu.clear();
-
-        // -- 清除附加觸發區
-        this._accessibility.AddonTrigger.clear();
-        this._accessibility = null;
     }
 
     // 窗口添加事件
