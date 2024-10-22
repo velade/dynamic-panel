@@ -191,18 +191,6 @@ export default class DynamicPanelExtension extends Extension {
             case "allocation-changed":
                 this._panel.setAllocation(floating);
                 this._accessibility.AddonTrigger.setAddonTriggers(floating);
-                if (this._settings.get_boolean("blur")) {
-                    GLib.Source.remove(this._updateBgDelay);
-                    const startTime = new Date().getTime();
-                    const duration = this._settings.get_int("duration");
-                    this._updateBgDelay = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
-                        const currentTime = new Date().getTime();
-                        this._panel.setBackground(floating);
-                        if (currentTime - startTime <= duration) {
-                            return true;
-                        }
-                    })
-                }
                 break;
             case "trigger-changed":
                 this._accessibility.AddonTrigger.setAddonTriggers(floating);
